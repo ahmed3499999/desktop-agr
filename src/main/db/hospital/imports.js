@@ -21,7 +21,7 @@ function get_all_import_ingredients(hos_id){
 }
 
 function get_supplier_imports(hos_id, supplier_id, limit, offset){
-    db=get_db()
+    const db=get_db()
     const st =db.prepare("SELECT * FROM ImportsHistory WHERE hos_id = ? AND supplier_id = ? AND id IN (SELECT import_id FROM ImportsIngredients) ORDER BY date DESC LIMIT ? OFFSET ?")
     const rows = st.all(hos_id, supplier_id, limit, offset)
     for (let i=0; i<rows.length; i++){
@@ -32,7 +32,7 @@ function get_supplier_imports(hos_id, supplier_id, limit, offset){
 }
 
 function get_hospital_imports(hos_id, limit, offset){
-    db=get_db()
+    const db=get_db()
     const st = db.prepare("SELECT * FROM ImportsHistory WHERE hos_id = ? AND id IN (SELECT import_id FROM ImportsIngredients) ORDER BY date DESC LIMIT ? OFFSET ?")
     const rows = st.all(hos_id, limit, offset)
     for (let i=0; i<rows.length; i++){
