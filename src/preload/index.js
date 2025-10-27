@@ -1,6 +1,6 @@
-import { contextBridge } from 'electron'
-const importsDB = require('../../main/db/hospital/imports')
-const ingredientsDB = require('../../main/db/hospital/ingredients')
+import { contextBridge } from 'electron';
+import * as ingredientsDB from '../main/db/hospital/ingredients';
+import * as importsDB from '../main/db/hospital/imports';
 
 contextBridge.exposeInMainWorld('importsDB', {
   get_import_count: (hos_id) => importsDB.get_import_count(hos_id),
@@ -10,7 +10,8 @@ contextBridge.exposeInMainWorld('importsDB', {
   update_import: (import_id, supplier_id, date, ingredients, amount_paid, note) => importsDB.update_import(import_id, supplier_id, date, ingredients, amount_paid, note),
   delete_Import: (import_id) => importsDB.delete_Import(import_id),
   get_all_import_ingredients: (hos_id) => importsDB.get_all_import_ingredients(hos_id)
-})
+});
+
 contextBridge.exposeInMainWorld('ingredientsDB', {
   get_ingredient: (ingredient_id) => ingredientsDB.get_ingredient(ingredient_id),
   get_hospital_ingredients: (hos_id) => ingredientsDB.get_hospital_ingredients(hos_id),
@@ -18,5 +19,3 @@ contextBridge.exposeInMainWorld('ingredientsDB', {
   update_ingredient: (ingredient_id, name, unit, return_cost, quantity) => ingredientsDB.update_ingredient(ingredient_id, name, unit, return_cost, quantity),
   delete_ingredient: (ingredient_id) => ingredientsDB.delete_ingredient(ingredient_id)
 })
-contextBridge.exposeInMainWorld('electronAPI', electronAPI)
-

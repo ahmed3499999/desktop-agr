@@ -1,26 +1,15 @@
+let hos_id = 1;
+
 function getIngredients() {
-    return GET(ingredients_endpoint());
+    return new Promise((resolve, reject) => resolve(window.ingredientsDB.get_hospital_ingredients(hos_id)))
 };
 
 function addIngredient(name, unit, return_cost = 0, quantity = 0) {
-    const ingredient = {
-        name: name,
-        unit: unit,
-        return_cost: return_cost,
-        quantity: quantity
-    };
-    return POST(ingredients_endpoint(), ingredient);
+    return new Promise((resolve, reject) => resolve(window.ingredientsDB.create_ingredient(hos_id, name, unit, return_cost, quantity)))
 };
 
 function updateIngredient(id, name, unit, return_cost = 0, quantity = 0) {
-    const ingredient = {
-        name: name,
-        unit: unit,
-        return_cost: return_cost,
-        quantity: quantity
-    };
-
-    return PUT(ingredients_endpoint(id), ingredient);
+    return new Promise((resolve, reject) => resolve(window.ingredientsDB.update_ingredient(id, name, unit, return_cost, quantity)))
 };
 
 // دوال الموردين من اول هنا
