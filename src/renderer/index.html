@@ -1,42 +1,904 @@
-<!doctype html>
-<html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>Electron</title>
-    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
-    <meta
-      http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:"
-    />
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام إدارة المستشفيات</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="src/css/admin.css">
+    <link rel="manifest" href="manifest.json" />
+</head>
+<body>
+    <div class="dashboard-container">
+        <header class="header">
+            <button class="hamburger-menu" id="hamburgerMenu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <h2 id="hospitalNameDisplay">
+                <span class="hospital-name">Admin</span>
+            </h2>
 
-    <link href="./assets/main.css" type="text/css" rel="stylesheet" />
-  </head>
+            <div class="mobile-overlay" id="mobileOverlay"></div>
+        </header>
+<nav class="mobile-sidebar" id="mobileSidebar">
+    <div class="sidebar-header">
+        <h3>القائمة الرئيسية</h3>
+        <button class="close-btn" id="closeSidebar">&times;</button>
+    </div>
+    
+    <ul class="main-menu">
+        <!-- تبويب المخزن -->
+        <li class="menu-item has-submenu">
+            <a href="#">
+                <i class="fas fa-box"></i> المخزن
+                <i class="fas fa-chevron-down arrow"></i>
+            </a>
+            <ul class="submenu">
+                <li><a href="#" data-category="المخزن" data-tab="الأصناف" onclick="handleMobileTabClick(event, this)"><i class="fas fa-list"></i> الأصناف</a></li>
+                <li><a href="#" data-category="المخزن" data-tab="الصادر" onclick="handleMobileTabClick(event, this)"><i class="fas fa-upload"></i> الصادر</a></li>
+                <li><a href="#" data-category="المخزن" data-tab="الوارد" onclick="handleMobileTabClick(event, this)"><i class="fas fa-download"></i> الوارد</a></li>
+                <li><a href="#" data-category="المخزن" data-tab="الهالك" onclick="handleMobileTabClick(event, this)"><i class="fas fa-trash-alt"></i> الهالك</a></li>
+            </ul>
+        </li>
+        
+        <!-- تبويب المستشفي -->
+        <li class="menu-item has-submenu">
+            <a href="#">
+                <i class="fas fa-utensils"></i> المستشفي
+                <i class="fas fa-chevron-down arrow"></i>
+            </a>
+            <ul class="submenu">
+                <li><a href="#" data-category="المستشفيات" data-tab="إدارة المستشفيات" onclick="handleMobileTabClick(event, this)"><i class="fas fa-list-alt"></i> إدارة المستشفيات </a></li>
+            </ul>
+        </li>
 
-  <body>
-    <div id="app">
-      <img alt="logo" class="logo" src="./assets/electron.svg" />
-      <div class="creator">Powered by niazy-vite</div>
-      <div class="text">
-        Build an Electron app with
-        <span class="js">JavaScript</span>
+        <!-- تبويب الموردين -->
+        <li class="menu-item has-submenu">
+            <a href="#">
+                <i class="fas fa-utensils"></i> الموردين
+                <i class="fas fa-chevron-down arrow"></i>
+            </a>
+            <ul class="submenu">
+                <li><a href="#" data-category="الموردين" data-tab="إدارة الموردين" onclick="handleMobileTabClick(event, this)"><i class="fas fa-list-alt"></i> إدارة الموردين</a></li>
+            </ul>
+        </li>
+        
+        <!-- تبويب المصروفات -->
+        <li class="menu-item has-submenu">
+            <a href="#">
+                <i class="fas fa-money-bill-wave"></i> المصروفات
+                <i class="fas fa-chevron-down arrow"></i>
+            </a>
+            <ul class="submenu">
+                <li><a href="#" data-category="المصروفات" data-tab="إدارة المصروفات" onclick="handleMobileTabClick(event, this)"><i class="fas fa-cog"></i> إدارة المصروفات</a></li>
+            </ul>
+        </li>
+        
+        <!-- تبويب التقارير -->
+        <li class="menu-item has-submenu">
+            <a href="#">
+                <i class="fas fa-chart-pie"></i> التقارير
+                <i class="fas fa-chevron-down arrow"></i>
+            </a>
+            <ul class="submenu">
+                <li>
+                    <a href="#" data-category="التقارير" data-tab="عرض التقارير" onclick="handleMobileTabClick(event,this)">
+                        <i class="fas fa-chart-bar"></i> عرض التقارير
+                    </a>
+                </li>
+            </ul>
+        </li>
+
+        <!-- تبويب تسجيل الخروج -->
+        <li class="menu-item">
+            <a href="#" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
+            </a>
+        </li>
+    </ul>
+</nav>
+        <main class="main-content">
+            <!-- عناصر ضرورية للتابات -->
+            <div class="tabs-container">
+            <h2></h2>
+            <p></p>
+            <div id="tabsWrapper" class="tabs-wrapper"></div>
+            </div>
+            <!-- تبويب الأصناف -->
+            <div id="storageContent" class="content-area">
+                <div class="table-section">
+                    <div class="add-row-form">
+                        <h4>إضافة صنف جديد</h4>
+                        <div class="form-inputs">
+                            <input type="text" id="itemName" placeholder="اسم الصنف">
+                            <select id="unitType">
+                                <option value="" disabled selected>اختر نوع الوحدة</option>
+                                <option value="وزن">وزن</option>
+                                <option value="حجم">حجم</option>
+                                <option value="عدد">عدد</option>
+                            </select>
+                            <select id="unitSubtype" style="display:none;">
+                                <option value="" disabled selected>اختر الوحدة</option>
+                            </select>
+                            <button id="addItemBtn" class="add-btn">إضافة صنف</button>
+                        </div>
+                    </div>
+                    <!-- نموذج تعديل صنف -->
+<div id="editItemModal" class="modal-overlay" style="display: none;">
+  <div class="modal-content1 modal-animate1">
+    <button class="modal-close-btn" id="closeModalBtn">&times;</button>
+    <div id="editItemForm" class="editItemForm">
+      <h4>تعديل الصنف</h4>
+      <div class="form-inputs">
+        <input type="text" id="editItemName" placeholder="اسم الصنف">
+
+        <select id="editUnitType">
+          <option value="" disabled selected>اختر نوع الوحدة</option>
+          <option value="وزن">وزن</option>
+          <option value="حجم">حجم</option>
+          <option value="عدد">عدد</option>
+        </select>
+
+        <select id="editUnitSubtype" disabled>
+          <option value="" disabled selected>اختر الوحدة</option>
+        </select>
+
+        <!-- ✅ إضافة حقل إدخال الكمية -->
+        <input 
+          type="number" 
+          id="editItemQuantity" 
+          placeholder="الكمية" 
+          min="0" 
+          step="0.01"
+        >
+
+        <button id="confirmEditBtnModal" class="save-btn">تأكيد</button>
+        <button id="cancelEditBtnModal" class="cancel-btn">إلغاء</button>
       </div>
-      <p class="tip">Please try pressing <code>F12</code> to open the devTool</p>
-      <div class="actions">
-        <div class="action">
-          <a href="https://electron-vite.org/" target="_blank" rel="noreferrer">Documentation</a>
-        </div>
-        <div class="action">
-          <a id="ipcHandler" target="_blank" rel="noreferrer">Send IPC</a>
-        </div>
-      </div>
+    </div>
+  </div>
+</div>
 
-      <ul class="versions">
-        <li class="electron-version"></li>
-        <li class="chrome-version"></li>
-        <li class="node-version"></li>
-      </ul>
+                    <div class="table-container">
+                        <table id="itemsTable" class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>اسم الصنف</th>
+                                    <th>الوحدة</th>
+                                    <th>الكمية</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="itemsTableBody"></tbody>
+                        </table>
+                        <div id="itemsEmptyMsg" class="empty-message">
+                            لا توجد أصناف مسجلة
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- تبويب الوارد - فاتورة -->
+            <div id="importContent" class="content-area" style="display:none;">
+                <!-- نموذج إنشاء فاتورة جديدة -->
+                <div class="invoice-form-section">
+                    <div class="invoice-header">
+                        <h3><i class="fas fa-file-invoice"></i> إنشاء فاتورة وارد جديدة</h3>
+                            <button id="createNewInvoiceBtn" class="add-btn" onclick="admin_invoice.startNewInvoice()">
+                                <i class="fas fa-plus"></i> فاتورة جديدة
+                            </button>
+                    </div>
+                    <div id="invoiceForm" class="invoice-form" style="display:none;">
+                        <div class="invoice-details">
+                            <div class="invoice-info">
+                                <div class="form-group">
+                                    <label for="invoiceDate">التاريخ:</label>
+                                    <input type="date" id="invoiceDate" class="input-item" />
+                                </div>
+                                    <div class="form-group">
+                                    <label for="supplierName">المورد:</label>
+                                    <select id="editSupplierName" class="input-item">
+                                        <option value="" disabled selected>اختر المورد</option>
+                                    </select>
+                                    </div>
+                                    <!-- يظهر فقط لما يختار "أخرى" -->
+                                    <div id="otherSupplierContainer" class="form-group" style="display:none;">
+                                    <label for="otherSupplierSelect">اختر المورد من القائمة:</label>
+                                    <select id="otherSupplierSelect" class="input-item">
+                                        <option value="" disabled selected>جاري التحميل...</option>
+                                    </select>
+                                    </div>
+                                    <input type="text" id="invoiceNotes" placeholder="ملاحظات الفاتورة">
+                            </div>
+                        </div>
+                        <!-- إضافة عنصر للفاتورة -->
+                        <div class="add-item-section">
+                            <h4>إضافة عنصر للفاتورة</h4>
+                            <div class="item-form">
+                                <div class="select-with-clear">
+                                    <select id="invoiceItemSelect" class="input-item" onchange="invoice.handleInvoiceItemSelect()">
+                                        <option value="" disabled selected>اختر الصنف</option>
+                                    </select>
+                                    <button class="clear-btn" id="clearInvoiceItemBtn" onclick="invoice.clearInvoiceItemSelection()" disabled>&times;</button>
+                                </div>
+                                <input type="text" id="invoiceItemUnit" readonly placeholder="الوحدة" class="input-item" />
+                                <input type="number" id="invoiceItemQuantity" placeholder="الكمية" step="0.001" min="0" class="input-item" />
+                                <input type="number" id="invoiceItemPrice" placeholder="سعر الوحدة" step="0.01" min="0" class="input-item" />
+                                <button id="addItemToInvoiceBtn" class="add-btn" onclick="invoice.addItemToInvoice()">إضافة للفاتورة</button>
+                            </div>
+                        </div>
+                        <!-- جدول عناصر الفاتورة -->
+                        <div class="invoice-items-table">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>الصنف</th>
+                                        <th>الوحدة</th>
+                                        <th>الكمية</th>
+                                        <th>سعر الوحدة</th>
+                                        <th>المجموع</th>
+                                        <th>الإجراءات</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="invoiceItemsBody"></tbody>
+                            </table>
+                            <div id="noInvoiceItemsMsg" class="empty-message">
+                                لم يتم إضافة أي عناصر للفاتورة
+                            </div>
+                        </div>
+                        <!-- مجاميع الفاتورة -->
+                        <div class="invoice-totals">
+                            <div class="totals-section">
+                                <div class="total-row">
+                                    <span>المجموع الكلي:</span>
+                                    <span id="invoiceTotal">0.00</span>
+                                </div>
+                                <div class="total-row">
+                                    <span>المبلغ المدفوع:</span>
+                                    <input type="number" id="invoicePaidAmount" placeholder="0.00" step="0.01" min="0" class="input-item" style="width: 150px;" />
+                                </div>
+                                <div class="total-row">
+                                    <span>المبلغ المتبقي:</span>
+                                    <span id="invoiceRemainingAmount" class="remaining-amount">0.00</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- أزرار الفاتورة -->
+                        <div class="invoice-actions">
+                            <button id="saveInvoiceBtn" class="save-btn" onclick="invoice.saveInvoice()">
+                                <i class="fas fa-save"></i> حفظ الفاتورة
+                            </button>
+                            <button id="cancelInvoiceBtn" class="cancel-btn" onclick="invoice.cancelInvoice()">
+                                <i class="fas fa-times"></i> إلغاء
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                                                
+                <!-- قائمة الفواتير المحفوظة -->
+<!-- قائمة الفواتير المحفوظة -->
+<div class="saved-invoices-section">
+    <h3><i class="fas fa-list"></i> الفواتير المحفوظة</h3>
+    <div id="savedInvoicesList" class="invoices-list"></div>
+    <div id="noInvoicesMsg" class="empty-message">
+        لا توجد فواتير محفوظة
     </div>
 
-    <script type="module" src="./src/renderer.js"></script>
-  </body>
+    <!-- ✅ إضافة مكان الترقيم -->
+    <div id="paginationContainer" class="pagination"></div>
+</div>
+
+            </div>
+            <!-- ✅ مودال عرض تفاصيل الفاتورة -->
+            <div id="invoiceDetailsModal" class="modal-overlay" style="display: none;">
+            <div class="modal-content" id="invoiceDetailsContent">
+                <!-- تفاصيل الفاتورة هتتحقن هنا -->
+            </div>
+            </div>
+            <!-- تبويب الصادر -->
+            <div id="exportContent" class="content-area" style="display:none;">
+            <!-- نموذج إنشاء فاتورة صادر جديدة -->
+            <div class="invoice-form-section">
+                <div class="invoice-header">
+                <h3><i class="fas fa-file-export"></i> إنشاء فاتورة صادر جديدة</h3>
+                <button id="createNewExportBtn" class="add-btn">
+                    <i class="fas fa-plus"></i> فاتورة جديدة
+                </button>
+                </div>
+
+                <div id="exportForm" class="invoice-form" style="display:none;">
+                <!-- تفاصيل الفاتورة -->
+                <div class="invoice-details">
+                    <div class="invoice-info">
+                    <div class="form-group">
+                        <label for="exportDate">التاريخ:</label>
+                        <input type="date" id="exportDate" class="input-item" />
+                    </div>
+                    <div class="form-group">
+                        <label for="hospitalSelect">المستشفى:</label>
+                        <select id="hospitalSelect" class="input-item">
+                        <option value="" disabled selected>اختر المستشفى</option>
+                        </select>
+                    </div>
+
+                    <input type="text" id="exportNotes" placeholder="ملاحظات الفاتورة">
+                    </div>
+                </div>
+
+                <!-- إضافة عنصر للفاتورة -->
+                <div class="add-item-section">
+                    <h4>إضافة عنصر للفاتورة</h4>
+                    <div class="item-form">
+                    <div class="select-with-clear">
+                        <select id="exportItemSelect" class="input-item">
+                        <option value="" disabled selected>اختر الصنف</option>
+                        </select>
+                        <button type="button" class="clear-btn" id="clearExportItemBtn" disabled>&times;</button>
+                    </div>
+                    <input type="text" id="exportItemUnit" readonly placeholder="الوحدة" class="input-item" />
+                    <input type="number" id="exportItemQuantity" placeholder="الكمية" step="0.001" min="0" class="input-item" />
+                    <button type="button" id="addItemToExportBtn" class="add-btn">إضافة للفاتورة</button>
+                    </div>
+                </div>
+
+                <!-- جدول عناصر الفاتورة -->
+                <div class="invoice-items-table">
+                    <table class="data-table">
+                    <thead>
+                        <tr>
+                        <th>الصنف</th>
+                        <th>الوحدة</th>
+                        <th>الكمية</th>
+                        <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="exportItemsBody"></tbody>
+                    </table>
+                    <div id="noExportItemsMsg" class="empty-message">لم يتم إضافة أي عناصر للفاتورة</div>
+                </div>
+
+                <!-- أزرار الفاتورة -->
+                <div class="invoice-actions">
+                    <button type="button" id="saveExportBtn" class="save-btn">
+                    <i class="fas fa-save"></i> حفظ الفاتورة
+                    </button>
+                    <button type="button" id="cancelExportBtn" class="cancel-btn">
+                    <i class="fas fa-times"></i> إلغاء
+                    </button>
+                </div>
+                </div>
+            </div>
+            <!-- قائمة فواتير الصادر المحفوظة -->
+            <div class="saved-invoices-section">
+                <h3><i class="fas fa-list"></i> الفواتير المحفوظة</h3>
+                <div id="savedExportsList" class="invoices-list"></div>
+                <div id="noExportsMsg" class="empty-message">لا توجد فواتير محفوظة</div>
+                <div id="exportPagination" class="pagination" style="display:none;"></div>
+            </div>
+            <div id="exportDetailsModal" class="modal-overlay" style="display:none;">
+                <div class="modal-content">
+                    <button id="closeExportModalBtn" class="modal-close-btn">&times;</button>
+                    <h2 class="modal-title">تفاصيل فاتورة الصادر</h2>
+                    <div id="exportDetailsContainer">
+                    <!-- سيتم ملئها ديناميكيًا -->
+                    </div>
+                </div>
+                </div>
+<div id="confirmDeleteModal" class="custom-confirm-modal" style="display:none;">
+  <div class="custom-confirm-content">
+    <p>هل أنت متأكد من حذف هذه الفاتورة؟</p>
+    <div class="custom-confirm-buttons">
+      <button id="confirmDeleteBtn" class="confirm-btn2">نعم</button>
+      <button id="cancelDeleteBtn" class="cancel-btn2">لا</button>
+    </div>
+  </div>
+</div>
+
+            </div>
+            <!-- تبويب الهالك  -->
+<div id="damagedContent" class="content-area" style="display:none;">
+    <div class="add-row-form">
+        <h4>إضافة هالك جديد</h4>
+        <div class="form-inputs">
+            <input type="date" id="damagedDate" placeholder="التاريخ">
+            <select id="damagedItemSelect" onchange="handleDamagedItemSelect()">
+                <option value="" disabled selected>اختر الصنف</option>
+            </select>
+            <input type="text" id="damagedItemUnit" readonly placeholder="الوحدة">
+            <input type="number" id="damagedItemQuantity" placeholder="الكمية" step="0.001" min="0">
+            <button id="addDamagedBtn" class="add-btn" onclick="addDamaged()">إضافة هالك</button>
+        </div>
+    </div>
+
+    <div class="table-section">
+        <div class="table-container">
+            <table id="damagedTable" class="data-table">
+                <thead>
+                    <tr>
+                        <th>التاريخ</th>
+                        <th>اسم الصنف</th>
+                        <th>الوحدة</th>
+                        <th>الكمية</th>
+                    </tr>
+                </thead>
+                <tbody id="damagedTableBody">
+                </tbody>
+            </table>
+            <div id="damagedEmptyMessage" class="empty-message" style="display: none;">
+                لا توجد بيانات هالك لعرضها
+            </div>
+        </div>
+
+        <!-- ✅ هنا مكان الباجيناشن -->
+        <div id="damagedPagination" class="pagination" style="margin-top:15px; text-align:center;">
+            <!-- أزرار الصفحات هتظهر هنا -->
+        </div>
+    </div>
+</div>
+
+            <!-- تبويب المستشفيات -->
+            <div id="hospitalsContent" class="content-area" style="display:none;">
+            <div class="content-text">                    
+                <div class="add-row-form">
+                <h4>إضافة مستشفى جديد</h4>
+                <div class="form-inputs">
+                    <input type="text" id="hospitalName" placeholder="اسم المستشفى">
+                    <input type="text" id="hospitalUsername" placeholder="اسم المستخدم">
+                    <input type="password" id="hospitalPassword" placeholder="كلمة المرور">
+                    <button id="addHospitalBtn" class="add-btn">
+                    <i class="fas fa-plus"></i> إضافة مستشفى
+                    </button>
+                </div>
+                </div>
+
+                <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                    <tr>
+                        <th>اسم المستشفى</th>
+                        <th>اسم المستخدم</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                    </thead>
+                    <tbody id="hospitalsTableBody">
+                    <!-- البيانات ستأتي من قاعدة البيانات -->
+                    </tbody>
+                </table>
+                <div id="hospitalsEmptyMessage" class="empty-message">
+                    لا توجد مستشفيات مسجلة
+                </div>
+                </div>
+            </div>
+            </div>
+
+            <!-- نافذة التعديل -->
+<div id="editHospitalModal" class="modal-overlay" style="display:none;">
+    <div class="modal-content modal-animate">
+        <button class="modal-close-btn">&times;</button>
+        <div id="editHospitalFormModal" class="edit-row-form">
+            <h4>تعديل بيانات المستشفى</h4>
+            <div class="form-inputs">
+                <input type="hidden" id="editHospitalId">
+                <input type="text" id="editHospitalName" placeholder="اسم المستشفى">
+                <input type="text" id="editHospitalUsername" placeholder="اسم المستخدم">
+                <input type="password" id="editHospitalPassword" placeholder="كلمة المرور">
+                <button id="confirmEditHospitalBtn" class="save-btn">تأكيد</button>
+                <button id="cancelEditHospitalBtn" class="cancel-btn">إلغاء</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+  <!-- ✅ نافذة تأكيد الحذف -->
+<div id="deleteHospitalModal" class="modal-overlay" style="display: none;">
+  <div class="modal-content modal-animate">
+    <div class="modal-header">
+      <h4 class="modal-title">هل تريد حذف المستشفى؟</h4>
+      <!-- زر إغلاق (×) -->
+      <button id="cancelDeleteHospital" class="modal-close-btn">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-actions">
+        <!-- زر تأكيد الحذف -->
+        <button id="confirmDeleteHospital" class="save-btn">نعم</button>
+        <!-- زر إلغاء الحذف -->
+        <button id="cancelDeleteHospitalBtn" class="cancel-btn">لا</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- تبويب الموردين -->
+<div id="suppliersContent" class="content-area" style="display: none;">
+  <h2><i class=""></i></h2>
+  <p class="content-text"></p>
+
+  <!-- إضافة مورد جديد -->
+  <div class="add-row-form">
+    <h4>إضافة مورد جديد</h4>
+    <div class="form-inputs" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+      <input type="text" id="supplierName" placeholder="اسم المورد" class="input-item" style="flex: 1 1 200px;">
+      <input type="text" id="supplierContact" placeholder="معلومات التواصل (مثال: 01012345678)" class="input-item" style="flex: 1 1 200px;">
+      <button class="add-btn" id="addSupplierBtn" style="flex: 0 0 auto;">
+        <i class="fas fa-plus"></i> إضافة مورد
+      </button>
+    </div>
+  </div>
+
+  <!-- جدول الموردين -->
+  <div class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>اسم المورد</th>
+          <th>معلومات التواصل</th>
+          <th>الإجراءات</th>
+        </tr>
+      </thead>
+      <tbody id="suppliersTableBody"></tbody>
+    </table>
+    <div id="suppliersEmptyMessage" class="empty-message">
+      لا توجد موردين مسجلين
+    </div>
+  </div>
+</div>
+
+<!-- نافذة واردات المورد -->
+<div id="supplierImportsPopup" class="modal-overlay" style="display: none; z-index: 10;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>الواردات الخاصة بالمورد: <span id="selectedSupplierName"></span></h3>
+      <button class="modal-close-btn" onclick="closeSupplierImportsPopup()">
+        &times;
+      </button>
+    </div>
+
+    <!-- إضافة واردات -->
+    <div class="add-row-form">
+      <div class="form-inputs">
+        <input type="date" id="importDate" class="input-item" placeholder="تاريخ الدفعة">
+        <input type="number" id="importAmountPaid" class="input-item" placeholder="المبلغ المدفوع">
+        <input type="text" id="importNote" class="input-item" placeholder="ملاحظات الدفعة">
+        <button class="add-btn" id="addImportBtn">
+          <i class="fas fa-plus"></i> دفع
+        </button>
+      </div>
+    </div>
+
+<!-- جدول الواردات -->
+<div class="table-section">
+  <div class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>التاريخ</th>
+          <th>المبلغ المدفوع</th>
+          <th>ملاحظات</th>
+        </tr>
+      </thead>
+      <tbody id="supplierImportsTableBody"></tbody>
+    </table>
+    <div id="importsEmptyMessage" class="empty-message">
+      لا توجد واردات مسجلة لهذا المورد
+    </div>
+  </div>
+
+  <!-- ✅ هنا مكان أزرار الـ Pagination -->
+  <div id="importsPagination" class="pagination" style="margin-top: 15px; text-align: center;"></div>
+</div>
+
+
+    <!-- فواتير المورد -->
+    <div class="content-section">
+        <br>
+      <h4><i class="fas fa-file-invoice"></i> الفواتير المرتبطة بهذا المورد</h4>
+        <br>
+      <div id="supplierInvoicesCards" class="invoices-list"></div>
+      <div id="invoicesPagination" class="pagination"></div>
+
+    </div>
+
+    <div class="modal-actions">
+      <button class="cancel-btn" onclick="closeSupplierImportsPopup()">
+        <i class="fas fa-times"></i> إغلاق 
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- نافذة تعديل المورد -->
+<div id="editSupplierModal" class="modal-overlay" style="display: none;">
+  <div class="modal-content1 modal-animate1">
+    <button class="modal-close-btn" onclick="closeEditSupplierModal()">&times;</button>
+    <div class="edit-row-form">
+      <h4>تعديل بيانات المورد</h4>
+      <div class="form-inputs">
+        <input type="text" id="editSupplierName1" class="input-item" placeholder="أدخل اسم المورد">
+        <input type="text" id="editSupplierContact" class="input-item" placeholder="أدخل معلومات التواصل">
+        <button id="saveEditSupplierBtn" class="save-btn"><i class="fas fa-save"></i> حفظ التعديلات</button>
+        <button id="cancelEditSupplierBtn" class="cancel-btn" onclick="closeEditSupplierModal()"><i class="fas fa-times"></i> إلغاء</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- تبويب المصروفات -->
+<div id="expensesContent" class="content-area" style="display:none;">
+    <div class="content-text">
+        <!-- ✅ نموذج إضافة مصروف جديد -->
+        <div class="add-row-form">
+            <h4>إضافة مصروف جديد</h4>
+            <div class="form-inputs">
+                <input type="date" id="expenseDate" placeholder="التاريخ">
+                <input type="number" id="expenseAmount" placeholder="المبلغ" step="0.01" min="0">
+                <input type="text" id="expenseDesc" placeholder="وصف المصروف">
+                <button id="addExpenseBtn" class="add-btn">إضافة</button>
+            </div>
+        </div>
+
+        <!-- ✅ جدول عرض المصروفات -->
+        <div class="table-section">
+            <div class="table-container">
+                <table id="expensesTable" class="data-table">
+                    <thead>
+                        <tr>
+                            <th>التاريخ</th>
+                            <th>المبلغ</th>
+                            <th>الوصف</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="expensesTableBody">
+                        <!-- الصفوف تضاف ديناميكياً -->
+                    </tbody>
+                </table>
+                <div id="expensesEmptyMessage" class="empty-message" style="display: none;">
+                    لا توجد مصروفات مسجلة
+                </div>
+            </div>
+
+            <!-- ✅ هنا الباجيناشن زي الهالك -->
+            <div id="expensesPagination" class="pagination" style="margin-top:15px; text-align:center;">
+                <!-- أزرار الصفحات هتظهر هنا -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- نافذة تحليل المصروفات -->
+<div id="analysisModal" class="expenses-modal-overlay" style="display:none;">
+    <div class="expenses-modal-box" style="max-width: 600px;">
+        <button class="expenses-close-btn" onclick="closeAnalysisModal()">&times;</button>
+        <h3>تحليل المصروفات خلال فترة</h3>
+
+        <!-- مدخلات التاريخ -->
+        <div class="expenses-form-inputs">
+            <div class="input-group">
+                <label for="analysisStartDate">من تاريخ</label>
+                <input type="date" id="analysisStartDate" placeholder="من تاريخ">
+            </div>
+            <div class="input-group">
+                <label for="analysisEndDate">إلى تاريخ</label>
+                <input type="date" id="analysisEndDate" placeholder="إلى تاريخ">
+            </div>
+            <button class="filter-btn" onclick="filterExpensesByDate()">عرض التحليل</button>
+        </div>
+
+        <!-- جدول المصروفات -->
+        <div class="expenses-table-container">
+            <table class="expenses-data-table">
+                <thead>
+                    <tr>
+                        <th>التاريخ</th>
+                        <th>الوصف</th>
+                        <th>المبلغ</th>
+                    </tr>
+                </thead>
+                <tbody id="analysisTableBody"></tbody>
+            </table>
+
+            <div id="analysisEmptyMessage" class="expenses-empty-message" style="display:none;">
+                لا توجد مصروفات ضمن هذه الفترة
+            </div>
+        </div>
+
+        <!-- الإجمالي -->
+        <div class="expenses-invoice-totals">
+            <span>الإجمالي: </span>
+            <span id="analysisTotal">0.00</span>
+        </div>
+    </div>
+</div>
+
+
+<!-- تبويب التقارير -->
+<div id="reportsContent" class="content-area">
+    <div class="filters-container">
+
+        <!-- الصف الأول: نوع التقرير + طريقة التقرير -->
+        <div class="report-form-row" style="display:flex; gap:15px;">
+            <div class="report-form-group">
+                <label for="reportType">نوع التقرير:</label>
+                <select id="reportType" class="report-select">
+                    <option value="" disabled selected>اختر نوع التقرير</option>
+                    <option value="suppliers">الموردين</option>
+                    <option value="financial">المصروفات</option>
+                    <option value="returns">المرتجعات</option>
+                    <option value="imports">الواردات</option>
+                    <option value="meals">الوجبات</option>
+                    <option value="damaged">الهالك</option>
+                    <option value="exports">الصادرات</option>
+                </select>
+            </div>
+
+            <div class="report-form-group" id="reportModeDiv" style="display:none;">
+                <label for="reportMode">طريقة التقرير:</label>
+                <select id="reportMode" class="report-select">
+                    <option value="" disabled selected>اختر الطريقة</option>
+                    <option value="daily">يومي</option>
+                    <option value="monthly">شهري</option>
+                    <option value="yearly">سنوي</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- الصف الثاني: فلاتر التاريخ -->
+        <div id="dateFilters" style="display:none; margin-top:10px;">
+            <!-- يومي -->
+            <div id="dailyFilters" style="display:none;">
+                <div class="report-form-group" id="dailyDefault">
+                    <label for="dailyMonth">اختر شهر:</label>
+                    <input type="month" id="dailyMonth" class="report-input">
+                    <button type="button" id="dailyToggleBtn" class="toggle-btn">تخصيص فترة</button>
+                </div>
+                <div class="report-form-group" id="dailyCustom" style="display:none;">
+                    <label for="dailyCustomFrom">من:</label>
+                    <input type="date" id="dailyCustomFrom" class="report-input">
+                    <label for="dailyCustomTo">إلى:</label>
+                    <input type="date" id="dailyCustomTo" class="report-input">
+                    <button type="button" id="dailyCancelBtn" class="toggle-btn">إلغاء</button>
+                </div>
+            </div>
+
+            <!-- شهري -->
+            <div id="monthlyFilters" style="display:none;">
+                <div class="report-form-group" id="monthlyDefault">
+                    <label for="monthlyYear">اختر سنة:</label>
+                    <input type="number" id="monthlyYear" min="2000" max="2100" placeholder="مثال: 2025" class="report-input">
+                    <button type="button" id="monthlyToggleBtn" class="toggle-btn">تخصيص فترة</button>
+                </div>
+                <div class="report-form-group" id="monthlyCustom" style="display:none;">
+                    <label for="monthlyCustomFrom">من:</label>
+                    <input type="date" id="monthlyCustomFrom" class="report-input">
+                    <label for="monthlyCustomTo">إلى:</label>
+                    <input type="date" id="monthlyCustomTo" class="report-input">
+                    <button type="button" id="monthlyCancelBtn" class="toggle-btn">إلغاء</button>
+                </div>
+            </div>
+
+            <!-- سنوي -->
+            <div id="yearlyFilters" style="display:none;">
+                <div class="report-form-group">
+                    <label for="yearlyFrom">من سنة:</label>
+                    <input type="number" id="yearlyFrom" min="2000" max="2100" placeholder="مثال: 2020" class="report-input">
+                    <label for="yearlyTo">إلى سنة:</label>
+                    <input type="number" id="yearlyTo" min="2000" max="2100" placeholder="مثال: 2025" class="report-input">
+                </div>
+            </div>
+        </div>
+
+<!-- الموردين -->
+<div id="suppliersDiv" style="display:none; margin-top:10px;">
+  <label for="suppliersSearch">الموردين:</label>  
+  <!-- قائمة الموردين -->
+  <div id="suppliersContainer" style="border:1px solid #ccc; border-radius:6px; padding:10px; max-height:150px; overflow-y:auto;">
+    <!-- سيتم ملء الموردين هنا -->
+  </div>
+</div>
+
+
+        <!-- المستشفيات -->
+        <div id="hospitalDiv" style="display:none; margin-top:10px;">
+            <div class="report-form-group">
+                <label for="hospitalSelectReports">المستشفى:</label>
+                <select id="hospitalSelectReports" class="report-select">
+                    <option value="" disabled selected>اختر مستشفى</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- الأصناف (multi-select احترافي) -->
+<div id="ingredientsDiv" style="display:none; margin-top:10px;">
+  <label>الأصناف:</label>
+  <div id="ingredientsContainer" style="border:1px solid #ccc; border-radius:6px; padding:10px; max-height:150px; overflow-y:auto;">
+    <!-- الأصناف سيتم إضافتها هنا بشكل checkbox -->
+  </div>
+</div>
+
+
+<!-- زر عرض التقرير و زر الطباعة (ضعه مكان زر العرض الحالي) -->
+<div style="display:flex; gap:10px; align-items:center; margin-top:15px;">
+  <button id="generateReportBtn" class="add-btnn">
+    <i class="fas fa-chart-line"></i> عرض التقرير
+  </button>
+
+  <!-- طباعة التقرير — نفس ستايل الأزرار الزرقاء -->
+  <button id="printReportBtn" class="add-btnn" style="background: linear-gradient(90deg,#4f46e5,#3b82f6); color:#fff;">
+    <i class="fas fa-print"></i> طباعة التقرير
+  </button>
+</div>
+
+    </div>
+
+    <!-- نتائج التقرير -->
+    <div id="reportResults" class="table-container" style="margin-top:15px;">
+        <!-- رسم بياني -->
+        <canvas id="reportChart" style="max-width:600px; margin-bottom:20px; display:none;"></canvas>
+
+        <!-- جدول ديناميكي -->
+        <table class="data-table" id="analysisTable" style="display:none; width:100%;">
+            <thead>
+                <tr id="analysisTableHeader"></tr>
+            </thead>
+            <tbody id="analysisTableBody"></tbody>
+            <tfoot id="analysisTableFooter"></tfoot>
+        </table>
+
+        <p id="analysisEmptyMessage" style="display:none; color:red; margin-top:10px;">لا توجد بيانات مطابقة.</p>
+    </div>
+</div>
+
+
+
+
+
+
+
+            <div id="logoutConfirmModal" class="custom-confirm" style="display:none;">
+                <div class="confirm-content">
+                    <p>هل أنت متأكد من تسجيل الخروج؟</p>
+                    <div>
+                    <button id="confirmLogoutBtn" class="confirm-button">نعم</button>
+                    <button id="cancelLogoutBtn" class="cancel-button">لا</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+                <nav class="sidebar-nav" id="sidebarNav">
+                <!-- Added sidebar header -->
+                    <div class="sidebar-header">
+                        <h3>القائمة الرئيسية</h3>
+                    </div>
+
+            <button class="nav-item active" data-section="inventory" data-category="المخزن">
+             <i class="fas fa-box"></i> <span>المخزن</span>
+            </button>
+            <button class="nav-item" data-section="hospitals" data-category="المستشفيات">
+                <i class="fas fa-hospital"></i> <span>المستشفيات</span>
+            </button>
+            <button class="nav-item" data-section="suppliers" data-category="الموردين">
+                <i class="fas fa-truck"></i> <span>الموردين</span>
+            </button>
+            <button class="nav-item" data-section="expenses" data-category="المصروفات">
+                <i class="fas fa-money-bill-wave"></i> <span>المصروفات</span>
+            </button>
+            <button class="nav-item" data-section="reports" data-category="التقارير">
+                <i class="fas fa-chart-pie"></i> <span>التقارير</span>
+            </button>
+            <button class="nav-item logout-btn">
+                <i class="fas fa-sign-out-alt"></i> <span>تسجيل الخروج</span>
+            </button>
+
+        </nav>
+        <footer class="footer">
+        </footer>
+    </div>
+    <script src="src/js/api_calls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+    <script type="module" src="src/js/admin.js"></script>
+</body>
 </html>

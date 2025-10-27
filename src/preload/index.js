@@ -1,5 +1,4 @@
 import { contextBridge } from 'electron'
-import { electronAPI } from '@electron-toolkit/preload'
 const importsDB = require('../../main/db/hospital/imports')
 const ingredientsDB = require('../../main/db/hospital/ingredients')
 
