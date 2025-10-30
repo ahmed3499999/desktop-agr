@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>نظام إدارة المخزن</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="css/user.css" />
+    <link rel="manifest" href="manifest.json" />
+</head>
+<body>
+    <div class="dashboard-container">
+        <header class="header">
+    <!-- زر الرجوع بأيقونة فقط -->
+    <button class="back-btn" onclick="window.history.back()">
+        <i class="fas fa-arrow-left"></i>
+    </button>
+
+    <!-- زر قائمة البرجر -->
+    <button class="hamburger-menu" id="hamburgerMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+
+    <!-- اسم المستشفى -->
+    <h2 id="hospitalNameDisplay">
+        جاري تحميل اسم المستشفى...
+    </h2>
+
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+</header>
+
+
+        <!-- قائمة البرجر الجديدة -->
+<nav class="mobile-sidebar" id="mobileSidebar">
+    <div class="sidebar-header">
+        <h3>القائمة الرئيسية</h3>
+        <button class="close-btn" id="closeSidebar">&times;</button>
+    </div>
+    
+    <ul class="main-menu">
+        <!-- تبويب المخزن -->
+        <li class="menu-item has-submenu">
+            <a href="#">
+                <i class="fas fa-box"></i> المخزن
+                <i class="fas fa-chevron-down arrow"></i>
+            </a>
+            <ul class="submenu">
+                <li><a href="#" data-category="المخزن" data-tab="الأصناف" onclick="handleMobileTabClick(event, this)"><i class="fas fa-list"></i> الأصناف</a></li>
+                <li><a href="#" data-category="المخزن" data-tab="الصادر" onclick="handleMobileTabClick(event, this)"><i class="fas fa-upload"></i> الصادر</a></li>
+                <li><a href="#" data-category="المخزن" data-tab="الوارد" onclick="handleMobileTabClick(event, this)"><i class="fas fa-download"></i> الوارد</a></li>
+                <li><a href="#" data-category="المخزن" data-tab="المرتجع" onclick="handleMobileTabClick(event, this)"><i class="fas fa-undo"></i> المرتجع</a></li>
+                <li><a href="#" data-category="المخزن" data-tab="الهالك" onclick="handleMobileTabClick(event, this)"><i class="fas fa-trash-alt"></i> الهالك</a></li>
+            </ul>
+        </li>
+        
+        <!-- تبويب الوجبات -->
+        <li class="menu-item has-submenu">
+            <a href="#">
+                <i class="fas fa-utensils"></i> الوجبات
+                <i class="fas fa-chevron-down arrow"></i>
+            </a>
+            <ul class="submenu">
+                <li><a href="#" data-category="الوجبات" data-tab="قائمة الوجبات" onclick="handleMobileTabClick(event, this)"><i class="fas fa-list-alt"></i> قائمة الوجبات</a></li>
+                <li><a href="#" data-category="الوجبات" data-tab="تصدير وجبات" onclick="handleMobileTabClick(event, this)"><i class="fas fa-file-export"></i> تصدير وجبات</a></li>
+            </ul>
+        </li>
+        
+        <!-- تبويب المصروفات -->
+        <li class="menu-item has-submenu">
+            <a href="#">
+                <i class="fas fa-money-bill-wave"></i> المصروفات
+                <i class="fas fa-chevron-down arrow"></i>
+            </a>
+            <ul class="submenu">
+                <li><a href="#" data-category="المصروفات" data-tab="إدارة المصروفات" onclick="handleMobileTabClick(event, this)"><i class="fas fa-cog"></i> إدارة المصروفات</a></li>
+            </ul>
+        </li>
+        
+        <!-- تبويب تسجيل الخروج -->
+        <li class="menu-item">
+            <a href="#" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
+            </a>
+        </li>
+    </ul>
+</nav>
+
+
+        <main class="main-content">
+            <div class="tabs-container">
+                <div class="tabs-wrapper" id="tabsWrapper"></div>
+            </div>
+
+                                                            
+            <!-- تبويب الأصناف -->
+<div id="mainContent" class="content-area">
+    <div class="table-section">
+        <div class="add-row-form">
+            <h4>إضافة صنف جديد</h4>
+            <div class="form-inputs">
+                <input type="text" id="itemName" placeholder="اسم الصنف">
+                <select id="unitType">
+                    <option value="" disabled selected>اختر نوع الوحدة</option>
+                    <option value="وزن">وزن</option>
+                    <option value="حجم">حجم</option>
+                    <option value="عدد">عدد</option>
+                </select>
+                <select id="unitSubtype" style="display:none;">
+                    <option value="" disabled selected>اختر الوحدة</option>
+                </select>
+                <input type="number" id="itemCost" placeholder="سعر المرتجع" step="0.01" min="0">
+                <button id="addItemBtn" class="add-btn">إضافة صنف</button>
+            </div>
+        </div>
+
+        <!-- نموذج تعديل صنف -->
+        <div id="editItemForm" class="edit-row-form" style="display:none;">
+            <h4>تعديل الصنف</h4>
+            <div class="form-inputs">
+                <input type="text" id="editItemName" placeholder="اسم الصنف">
+                <select id="editUnitType">
+                    <option value="" disabled selected>اختر نوع الوحدة</option>
+                    <option value="وزن">وزن</option>
+                    <option value="حجم">حجم</option>
+                    <option value="عدد">عدد</option>
+                </select>
+                <select id="editUnitSubtype" disabled>
+                    <option value="" disabled selected>اختر الوحدة</option>
+                </select>
+                <input type="number" id="editItemCost" placeholder="سعر المرتجع" step="0.01" min="0">
+                <button id="confirmEditBtn" class="save-btn">تأكيد</button>
+                <button id="cancelEditBtn" class="cancel-btn">إلغاء</button>
+            </div>
+        </div>
+
+        <div class="items-table-container">
+            <table id="itemsTable" class="items-data-table">
+                <thead>
+                    <tr>
+                        <th>اسم الصنف</th>
+                        <th>الوحدة</th>
+                        <th>الكمية</th>
+                        <th>سعر المرتجع</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody id="itemsTableBody"></tbody>
+            </table>
+            <div id="itemsEmptyMsg" class="empty-message">
+                لا توجد أصناف مسجلة
+            </div>
+        </div>
+
+        <!-- ✅ pagination أسفل الجدول -->
+        <div id="itemsPagination" class="pagination" style="text-align:center;"></div>
+    </div>
+</div>
+
+                                    
+            <!-- تبويب الوارد - فاتورة -->
+<div id="importContent" class="content-area" style="display:none;">
+    <!-- نموذج إنشاء فاتورة جديدة -->
+    <div class="invoice-form-section">
+        <div class="invoice-header">
+            <h3><i class="fas fa-file-invoice"></i> إنشاء فاتورة وارد جديدة</h3>
+            <button id="createNewInvoiceBtn" class="add-btn" onclick="invoice.createNewInvoice()">
+                <i class="fas fa-plus"></i> فاتورة جديدة
+            </button>
+        </div>
+                                                                            
+        <div id="invoiceForm" class="invoice-form" style="display:none;">
+            <div class="invoice-details">
+                <div class="invoice-info">
+                    <div class="form-group">
+                        <label for="invoiceDate">التاريخ:</label>
+                        <input type="date" id="invoiceDate" class="input-item" />
+                    </div>
+                    <div class="form-group">
+                        <label for="supplierName">المورد:</label>
+                        <select id="supplierName" class="input-item">
+                            <option value="" disabled selected>اختر المورد</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+                                                                                    
+            <!-- إضافة عنصر للفاتورة -->
+            <div class="add-item-section">
+                <h4>إضافة عنصر للفاتورة</h4>
+                <div class="item-form">
+                    <div class="select-with-clear">
+                        <select id="invoiceItemSelect" class="input-item" onchange="invoice.handleInvoiceItemSelect()">
+                            <option value="" disabled selected>اختر الصنف</option>
+                        </select>
+                        <button class="clear-btn" id="clearInvoiceItemBtn" onclick="invoice.clearInvoiceItemSelection()" disabled>&times;</button>
+                    </div>
+                    <input type="text" id="invoiceItemUnit" readonly placeholder="الوحدة" class="input-item" />
+                    <input type="number" id="invoiceItemQuantity" placeholder="الكمية" step="0.001" min="0" class="input-item" />
+                    <input type="number" id="invoiceItemPrice" placeholder="سعر الوحدة" step="0.01" min="0" class="input-item" />
+                    <button id="addItemToInvoiceBtn" class="add-btn" onclick="invoice.addItemToInvoice()">إضافة للفاتورة</button>
+                </div>
+            </div>
+                                                                                    
+            <!-- جدول عناصر الفاتورة -->
+            <div class="invoice-items-table">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>الصنف</th>
+                            <th>الوحدة</th>
+                            <th>الكمية</th>
+                            <th>سعر الوحدة</th>
+                            <th>المجموع</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="invoiceItemsBody"></tbody>
+                </table>
+                <div id="noInvoiceItemsMsg" class="empty-message">
+                    لم يتم إضافة أي عناصر للفاتورة
+                </div>
+            </div>
+                                                                                    
+            <!-- مجاميع الفاتورة -->
+            <div class="invoice-totals">
+                <div class="totals-section">
+                    <div class="total-row">
+                        <span>المجموع الكلي:</span>
+                        <span id="invoiceTotal">0.00</span>
+                    </div>
+                </div>
+            </div>
+                                                                                    
+            <!-- أزرار الفاتورة -->
+            <div class="invoice-actions">
+                <button id="saveInvoiceBtn" class="save-btn" onclick="invoice.saveInvoice()">
+                    <i class="fas fa-save"></i> حفظ الفاتورة
+                </button>
+                <button id="cancelInvoiceBtn" class="cancel-btn" onclick="invoice.cancelInvoice()">
+                    <i class="fas fa-times"></i> إلغاء
+                </button>
+            </div>
+        </div>
+    </div>
+                                                        
+    <!-- قائمة الفواتير المحفوظة -->
+    <div class="saved-invoices-section">
+        <h3><i class="fas fa-list"></i> الفواتير المحفوظة</h3>
+        <div id="savedInvoicesList" class="invoices-list">
+            <!-- الفواتير ستظهر هنا -->
+        </div>
+        <div id="noInvoicesMsg" class="empty-message">
+            لا توجد فواتير محفوظة
+        </div>
+        
+        <!-- ✅ Pagination للفواتير المحفوظة -->
+        <div id="invoicesPagination" class="pagination" style="text-align:center; margin-top: 20px;"></div>
+    </div>
+    
+    <div id="invoiceDetailsModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="invoice.closeInvoiceModal()">&times;</span>
+            <div id="invoiceDetailsContent"></div>
+        </div>
+    </div>
+    
+</div>
+
+            <!-- تبويب الصادر -->
+            <div id="exportContent" class="content-area" style="display:none;">
+                <div class="table-section">
+                    <div class="table-container">
+                        <table id="exportTable" class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>التاريخ</th>
+                                    <th>اسم الصنف</th>
+                                    <th>الوحدة</th>
+                                    <th>الكمية</th>
+                                </tr>
+                            </thead>
+                            <tbody id="exportTableBody">
+                                <!-- البيانات ستضاف هنا جافاسكريبت -->
+                            </tbody>
+                        </table>
+                        <div id="exportEmptyMessage" class="empty-message">
+                            لا توجد بيانات صادر لعرضها
+                        </div>
+                    </div>
+                </div>
+            </div>
+                                    
+         <!-- تبويب المرتجع -->
+<div id="returnsContent" class="content-area" style="display:none;">
+    <div class="add-row-form">
+        <h4>إضافة مرتجع جديد</h4>
+        <div class="form-inputs">
+            <input type="date" id="returnDate" placeholder="التاريخ">
+            <select id="returnItemSelect" onchange="handleReturnItemSelect()">
+                <option value="" disabled selected>اختر الصنف</option>
+            </select>
+            <input type="text" id="returnItemUnit" readonly placeholder="الوحدة">
+            <input type="number" id="returnItemQuantity" placeholder="الكمية" step="0.001" min="0">
+            <input type="number" id="returnItemPrice" readonly placeholder="سعر الوحدة">
+            <button id="addReturnBtn" class="add-btn" onclick="addReturn()">إضافة مرتجع</button>
+        </div>
+    </div>
+
+    <div class="table-section">
+        <div class="table-container" style="overflow-x:auto;">
+            <table id="returnsTable" class="data-table">
+                <thead>
+                    <tr>
+                        <th>التاريخ</th>
+                        <th>اسم الصنف</th>
+                        <th>الوحدة</th>
+                        <th>الكمية</th>
+                        <th>سعر الوحدة</th>
+                        <th>السعر الكلي</th>
+                    </tr>
+                </thead>
+                <tbody id="returnsTableBody">
+                    <!-- البيانات ستُضاف هنا جافاسكريبت -->
+                </tbody>
+            </table>
+
+            <div id="returnsEmptyMessage" class="empty-message" style="display: none;">
+                لا توجد بيانات مرتجع لعرضها
+            </div>
+        </div>
+
+        <!-- ✅ pagination أسفل الجدول -->
+        <div id="returnsPagination" class="pagination" style="text-align:center;"></div>
+    </div>
+</div>
+
+<!-- تبويب الهالك  -->
+<div id="damagedContent" class="content-area" style="display:none;">
+    <div class="add-row-form">
+        <h4>إضافة هالك جديد</h4>
+        <div class="form-inputs">
+            <input type="date" id="damagedDate" placeholder="التاريخ">
+            <select id="damagedItemSelect" onchange="handleDamagedItemSelect()">
+                <option value="" disabled selected>اختر الصنف</option>
+            </select>
+            <input type="text" id="damagedItemUnit" readonly placeholder="الوحدة">
+            <input type="number" id="damagedItemQuantity" placeholder="الكمية" step="0.001" min="0">
+            <button id="addDamagedBtn" class="add-btn" onclick="addDamaged()">إضافة هالك</button>
+        </div>
+    </div>
+    <div class="table-section">
+        <div class="table-container" style="overflow-x:auto;">
+            <table id="damagedTable" class="data-table">
+                <thead>
+                    <tr>
+                        <th>التاريخ</th>
+                        <th>اسم الصنف</th>
+                        <th>الوحدة</th>
+                        <th>الكمية</th>
+                    </tr>
+                </thead>
+                <tbody id="damagedTableBody">
+                    <!-- البيانات ستضاف هنا جافاسكريبت -->
+                </tbody>
+            </table>
+
+            <div id="damagedEmptyMessage" class="empty-message" style="display: none;">
+                لا توجد بيانات هالك لعرضها
+            </div>
+        </div>
+
+        <!-- ✅ pagination أسفل الجدول -->
+        <div id="damagedPagination" class="pagination" style="text-align:center;"></div>
+    </div>
+</div>
+
+
+
+            <!-- تبويب قائمة الوجبات -->
+<div id="mealsListContent" class="content-area" style="display: none;">
+    <!-- نموذج إنشاء جدول جديد -->
+    <div class="add-row-form">
+        <h4>إنشاء جدول وجبات جديد</h4>
+        <div class="form-inputs">
+            <input type="text" id="patientTypeInput" placeholder="نوع المريض">
+            <select id="scheduleNameSelect" onchange="handleScheduleNameChange(event)">
+                <option value="" disabled selected>اختر اسم الوجبة</option>
+                <option value="وجبة الفطار">وجبة الفطار</option>
+                <option value="وجبة الغذاء">وجبة الغذاء</option>
+                <option value="وجبة العشاء">وجبة العشاء</option>
+                <option value="other">أخرى</option>
+            </select>
+            <input type="text" id="customScheduleInput" placeholder="اسم الوجبة الأخرى" style="display:none;">
+            <input type="number" id="scheduleCostInput" placeholder="تكلفة الوجبة" step="0.01" min="0">
+            <input type="text" id="scheduleNoteInput" placeholder="ملاحظات (اختياري)">
+            <button onclick="createSchedule()" class="add-btn">إنشاء الجدول</button>
+        </div>
+    </div>
+
+    <!-- بحث في الجداول -->
+    <div class="search-container" style="margin: 10px 0;">
+        <input type="text" id="searchSchedules">
+    </div>
+
+    <!-- قائمة الجداول -->
+    <div class="schedules-scroll-container">
+        <div id="schedulesList" class="schedules-grid">
+            <!-- سيتم ملؤها من JavaScript -->
+        </div>
+        <div id="noSchedulesMsg" class="empty-message" style="display: none;">
+            لا توجد جداول مضافة
+        </div>
+    </div>
+</div>
+
+
+            <!-- تبويب تصدير وجبات -->
+<div id="mealExportContent" class="content-area" style="display:none;">
+    <!-- نموذج إنشاء فاتورة تصدير جديدة -->
+    <div class="invoice-form-section">
+        <div class="invoice-header">
+            <h3><i class="fas fa-utensils"></i> إنشاء فاتورة تصدير وجبات جديدة</h3>
+            <button id="createNewMealExportBtn" class="add-btn" onclick="mealExport.createNewMealExport()">
+                <i class="fas fa-plus"></i> فاتورة جديدة
+            </button>
+        </div>
+                                                                                    
+        <div id="mealExportForm" class="invoice-form" style="display:none;">
+            <div class="invoice-details">
+                <div class="invoice-info">
+                    <div class="form-group">
+                        <label for="mealExportDate">التاريخ:</label>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="date" id="mealExportDate" class="input-item" onchange="
+                                const dayNameInput = document.getElementById('dayNameInput');
+                                if (dayNameInput && this.value) {
+                                    const date = new Date(this.value + 'T12:00:00');
+                                    const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+                                    dayNameInput.value = days[date.getDay()] || '';
+                                }
+                            " />
+                            <input type="text" id="dayNameInput" class="input-item" readonly placeholder="اليوم" style="width: 100px; background: #f8f9fa; color: #495057; font-weight: bold;" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+                                                                                        
+            <!-- إضافة وجبة للفاتورة -->
+            <div class="add-item-section">
+                <h4>إضافة وجبة للفاتورة</h4>
+                <div class="item-form">
+                    <div class="select-with-clear">
+                        <select id="mealExportSelect" class="input-item" onchange="mealExport.handleMealExportSelect()">
+                            <option value="" disabled selected>اختر الوجبة</option>
+                        </select>
+                        <button class="clear-btn" id="clearMealExportBtn" onclick="mealExport.clearMealExportSelection()" disabled>&times;</button>
+                    </div>
+                    <input type="number" id="mealExportQuantity" placeholder="الكمية" step="1" min="1" class="input-item" />
+                    <input type="number" id="mealExportCost" readonly placeholder="تكلفة الوحدة" class="input-item" />
+                    <button id="addMealToExportBtn" class="add-btn" onclick="mealExport.addMealToExport()">إضافة للفاتورة</button>
+                </div>
+            </div>
+                                                                                        
+            <!-- جدول وجبات الفاتورة -->
+            <div class="invoice-items-table">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>الوجبة</th>
+                            <th>الكمية</th>
+                            <th>تكلفة الوحدة</th>
+                            <th>المجموع</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="mealExportItemsBody"></tbody>
+                </table>
+                <div id="noMealExportItemsMsg" class="empty-message">
+                    لم يتم إضافة أي وجبات للفاتورة
+                </div>
+            </div>
+                                                                                        
+            <!-- مجاميع الفاتورة -->
+            <div class="invoice-totals">
+                <div class="totals-section">
+                    <div class="total-row">
+                        <span>المجموع الكلي:</span>
+                        <span id="mealExportTotal">0.00</span>
+                    </div>
+                </div>
+            </div>
+                                                                                        
+            <!-- أزرار الفاتورة -->
+            <div class="invoice-actions">
+                <button id="saveMealExportBtn" class="save-btn" onclick="mealExport.saveMealExport()">
+                    <i class="fas fa-save"></i> حفظ الفاتورة
+                </button>
+                <button id="cancelMealExportBtn" class="cancel-btn" onclick="mealExport.cancelMealExport()">
+                    <i class="fas fa-times"></i> إلغاء
+                </button>
+            </div>
+        </div>
+    </div>
+                                                        
+    <!-- قائمة الفواتير المحفوظة -->
+    <div class="saved-invoices-section">
+        <h3><i class="fas fa-list"></i> فواتير التصدير المحفوظة</h3>
+        <div id="savedMealExportsList" class="invoices-list">
+            <!-- الفواتير ستظهر هنا -->
+        </div>
+        <div id="noMealExportsMsg" class="empty-message">
+            لا توجد فواتير تصدير محفوظة
+        </div>
+        
+        <!-- ✅ Pagination لفواتير التصدير -->
+        <div id="mealExportsPagination" class="pagination" style="text-align:center; margin-top: 20px;"></div>
+    </div>
+</div>
+
+            <!-- تبويب المصروفات -->
+<div id="expensesContent" class="content-area" style="display:none;">
+    <h2></h2>
+    <div class="content-text">
+        <!-- نموذج إضافة مصروف جديد -->
+        <div class="add-row-form">
+            <h4>إضافة مصروف جديد</h4>
+            <div class="form-inputs">
+                <input type="date" id="expenseDate" placeholder="التاريخ">
+                <input type="number" id="expenseAmount" placeholder="المبلغ" step="0.01" min="0">
+                <input type="text" id="expenseDesc" placeholder="وصف المصروف">
+                <button id="addExpenseBtn" class="add-btn">إضافة</button>
+            </div>
+        </div>
+
+        <!-- جدول عرض المصروفات -->
+        <div class="table-container">
+            <table id="expensesTable" class="data-table">
+                <thead>
+                    <tr>
+                        <th>التاريخ</th>
+                        <th>المبلغ</th>
+                        <th>الوصف</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody id="expensesTableBody">
+                    <!-- الصفوف تضاف ديناميكياً -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- رسالة في حالة عدم وجود بيانات -->
+        <div id="expensesEmptyMessage" class="empty-message">
+            لا توجد مصروفات مسجلة
+        </div>
+
+        <!-- ✅ أزرار الصفحات -->
+        <div id="expensesPagination" class="pagination" style="margin-top:15px; text-align:center;">
+            <!-- الأزرار تضاف ديناميكياً -->
+        </div>
+    </div>
+</div>
+
+        </main>
+                        
+        <nav class="sidebar-nav" id="sidebarNav">
+    <!-- Added sidebar header -->
+    <div class="sidebar-header">
+        <h3>القائمة الرئيسية</h3>
+    </div>
+    
+    <!-- Existing nav items -->
+    <button class="nav-item active" data-category="المخزن" data-color="red">
+        <i class="fas fa-box"></i> <span>المخزن</span>
+    </button>
+    <button class="nav-item" data-category="الوجبات" data-color="orange">
+        <i class="fas fa-utensils"></i> <span>الوجبات</span>
+    </button>
+    <button class="nav-item" data-category="المصروفات" data-color="purple">
+        <i class="fas fa-money-bill-wave"></i> <span>المصروفات</span>
+    </button>
+    <button class="nav-item logout-btn">
+        <i class="fas fa-sign-out-alt"></i> <span>تسجيل الخروج</span>
+    </button>
+</nav>
+                        
+        <footer class="footer">
+        </footer>
+    </div>
+
+<!-- نافذة عرض محتوى الجدول - النسخة المحسنة -->
+<div id="scheduleModal" class="modal-overlay" style="display:none;">
+  <div class="modal-content2 modal-animate">
+    <button class="modal-close-btn2" onclick="closeScheduleModal()" aria-label="إغلاق النافذة">&times;</button>
+    <h3 id="modalScheduleTitle">تفاصيل جدول الوجبات</h3>
+    <div id="modalScheduleDays">
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>اليوم</th>
+              <th>اسم الصنف</th>
+              <th>الكمية</th>
+              <th>+</th>
+              <th>ملاحظات</th>
+            </tr>
+          </thead>
+          <tbody id="scheduleMealsBody">
+            <!-- يُملأ من JavaScript -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+            <!-- جدول مؤقت لعرض المكونات قبل التأكيد -->
+<div id="previewContainer" class="table-container" style="display: none;">
+    <table class="data-table preview-table">
+        <thead>
+            <tr>
+                <th class="item-col">الصنف</th>
+                <th class="qty-col">الكمية</th>
+                <th class="unit-col">الوحدة</th>
+                <th class="actions-col">حذف</th>
+            </tr>
+        </thead>
+        <tbody id="schedulePreviewRows">
+            <!-- صفوف يتم إنشاؤها ديناميكياً -->
+        </tbody>
+    </table>
+</div>
+        </div>
+    </div>
+
+    <div id="addMealModal" class="add-meal-modal-overlay">
+        <div class="add-meal-modal-content">
+            <button class="add-meal-modal-close-btn" onclick="closeAddMealModal()">&times;</button>
+            <h3 class="add-meal-modal-title">
+                إضافة مكونات لليوم: <span id="selectedWeekdayNameModal" style="color: #007bff;"></span>
+            </h3>
+            <div class="add-meal-form-inputs-row">
+                <select id="ingredientSelect" onchange="updateIngredientUnit()" class="input-item">
+                    <option disabled selected>اختر الصنف</option>
+                </select>
+                <input type="text" id="ingredientQuantity" placeholder="الكمية" class="input-item">
+                <input type="text" id="ingredientUnit" class="input-item" readonly placeholder="الوحدة">
+            </div>
+            <div style="text-align: center; margin-bottom: 15px;">
+                <button onclick="confirmAddIngredientToDay()" class="add-btn">إضافة مكون</button>
+            </div>
+            <div class="add-meal-table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>الصنف</th>
+                            <th>الكمية</th>
+                            <th>الوحدة</th>
+                            <th>الإجراءات</th>                               
+                        </tr>
+                    </thead>
+                    <tbody id="addMealPreviewRows"></tbody>
+                </table>
+            </div>
+            <div class="add-meal-form-buttons">
+                <button onclick="confirmAddScheduleMeal()" class="add-btn">تأكيد الوجبة</button>
+                <button onclick="cancelAddScheduleMeal()" class="cancel-btn">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة نسخ الجدول -->
+    <div id="cloneScheduleModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content modal-animate" style="max-width: 450px;">
+            <button class="modal-close-btn" onclick="closeCloneScheduleModal()">&times;</button>
+            <h4 style="margin-bottom: 10px;">نسخ جدول الوجبات</h4>
+            <div class="form-inputs">
+                <input type="text" id="cloneScheduleName" placeholder="اسم الجدول الجديد">
+                <input type="text" id="clonePatientType" placeholder="نوع المريض الجديد">
+                <input type="text" id="cloneNote" placeholder="ملاحظات (اختياري)">
+                <div style="margin-top: 10px; display: flex; gap: 10px;">
+                    <button class="save-btn" onclick="confirmCloneSchedule()">تأكيد</button>
+                    <button class="cancel-btn" onclick="closeCloneScheduleModal()">إلغاء</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة تعديل بيانات الجدول -->
+    <div id="editScheduleModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content modal-animate" style="max-width: 450px;">
+            <button class="modal-close-btn" onclick="closeEditScheduleModal()">&times;</button>
+            <h3 style="margin-bottom: 10px;">تعديل بيانات الجدول</h3>
+            <div class="form-inputs">
+                <!-- نوع المريض -->
+                <input type="text" id="editPatientTypeInput" placeholder="نوع المريض">
+                <!-- اختيار اسم الوجبة -->
+                <select id="editScheduleNameSelect" onchange="handleScheduleNameChange(event)">
+                    <option disabled selected value="">اختر اسم الوجبة</option>
+                    <option value="وجبة الفطار">وجبة الفطار</option>
+                    <option value="وجبة الغذاء">وجبة الغذاء</option>
+                    <option value="وجبة العشاء">وجبة العشاء</option>
+                    <option value="other">أخرى</option>
+                </select>
+                <!-- حقل مخصص لاسم الوجبة -->
+                <input type="text" id="editCustomScheduleInput" placeholder="اسم الوجبة الأخرى" style="display: none;">
+                <!-- حقل تكلفة الوجبة -->
+                <input type="number" id="editScheduleCostInput" placeholder="تكلفة الوجبة" step="0.01" min="0">
+                <!-- حقل الملاحظات -->
+                <input type="text" id="editScheduleNoteInput" placeholder="ملاحظات (اختياري)">
+                <!-- الأزرار -->
+                <div style="margin-top: 10px; display: flex; gap: 10px;">
+                    <button class="save-btn" onclick="confirmEditSchedule()">تأكيد</button>
+                    <button class="cancel-btn" onclick="closeEditScheduleModal()">إلغاء</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+  
+
+    <!-- نافذة تعديل الصنف (مودال) -->
+<div id="editItemModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content modal-animate">
+        <button class="modal-close-btn" id="closeModalBtn">&times;</button>
+        <div id="editItemFormModal" class="edit-row-form">
+            <h4>تعديل الصنف</h4>
+            <div class="form-inputs">
+                <input type="text" id="editItemNameModal" placeholder="اسم الصنف">
+
+                <select id="editUnitTypeModal">
+                    <option value="" disabled selected>اختر نوع الوحدة</option>
+                    <option value="وزن">وزن</option>
+                    <option value="حجم">حجم</option>
+                    <option value="عدد">عدد</option>
+                </select>
+
+                <select id="editUnitSubtypeModal" disabled>
+                    <option value="" disabled selected>اختر الوحدة</option>
+                </select>
+
+                <!-- ✅ إضافة حقل الكمية -->
+                <input type="number" id="editItemQuantityModal" placeholder="الكمية" min="0" step="0.01">
+
+                <input type="number" id="editItemCostModal" placeholder="سعر المرتجع" step="0.01" min="0">
+
+                <button id="confirmEditBtnModal" class="save-btn">تأكيد</button>
+                <button id="cancelEditBtnModal" class="cancel-btn">إلغاء</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    <!-- Invoice Details Modal -->
+    <div id="invoiceDetailsModal" class="invoice-modal" style="display:none;">
+        <div class="invoice-modal-content">
+            <div class="invoice-modal-header">
+                <h3>تفاصيل الفاتورة</h3>
+                <button class="close-modal-btn" onclick="invoice.closeInvoiceModal()">&times;</button>
+            </div>
+            <div class="invoice-modal-body" id="invoiceDetailsContent">
+                <!-- تفاصيل الفاتورة ستظهر هنا -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Meal Export Details Modal -->
+<div id="mealExportDetailsModal" class="invoice-modal" style="display:none;">
+    <div class="invoice-modal-content">
+        <div class="invoice-modal-header">
+            <!-- هذا العنصر جديد لإظهار عنوان الفاتورة -->
+            <h3 id="mealExportModalTitle">تفاصيل فاتورة تصدير الوجبات</h3> 
+            <button class="close-modal-btn" onclick="mealExport.closeMealExportModal()">&times;</button>
+        </div>
+        <div class="invoice-modal-body" id="mealExportDetailsContent">
+            <!-- تفاصيل فاتورة التصدير ستظهر هنا -->
+        </div>
+    </div>
+</div>
+
+
+    <!-- ✅ هذا خاص بالنافذة المنبثقة لعرض الأصناف -->
+    <div id="mealExportItemsModal" class="modal-overlay" style="display:none;">
+  <div class="modal-content">
+    <button class="modal-close-btn" onclick="mealExport.closeMealExportItemsModal()">&times;</button>
+    <h2 class="modal-title">تفاصيل الأصناف</h2>
+    <table id="mealExportItemsTableModal" class="data-table">
+      <thead>
+        <tr>
+          <th>الصنف</th>
+          <th>الكمية</th>
+          <th>الوحدة</th>
+        </tr>
+      </thead>
+      <tbody id="mealExportItemsBodyModal">
+        <!-- الصفوف تضاف هنا من الجافاسكربت -->
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+    <!-- ✅ هذا مودال التأكيد قبل الحفظ -->
+<div id="mealIngredientsModal" class="modal-overlay" style="display:none; z-index: 1000;">
+    <div class="modal-content modal-animate" style="max-width: 900px; width: 90%; min-height: 500px;">
+        <button class="modal-close-btn" onclick="mealExport.closeMealIngredientsModal()">&times;</button>
+        <div class="modal-header">
+            <h3><i class="fas fa-utensils"></i> تفاصيل الوجبات والأصناف</h3>
+            <div class="modal-subtitle">
+                <span>التاريخ: </span>
+                <span id="modalExportDate" style="color: #3b82f6; font-weight: bold;"></span>
+                <span id="modalExportDay" style="color: #10b981; font-weight: bold; margin-right: 10px;"></span>
+            </div>
+        </div>
+        <div class="modal-body">
+            <div class="selected-meals-info">
+                <h4><i class="fas fa-utensils"></i> الوجبات المختارة:</h4>
+                <div id="selectedMealsDisplay" class="meals-display"></div>
+            </div>
+            <h4><i class="fas fa-boxes"></i> أصناف الوجبات الكلية في هذا اليوم:</h4>
+            
+            <!-- زر إضافة صنف يدوي مع تعديل المسافة -->
+            <div style="text-align: left; margin: 15px 0 20px 0;">
+                <button class="btn add-btn" onclick="mealExport.openManualIngredientModal()" style="background-color: #10b981; color: white; padding: 8px 15px;">
+                    <i class="fas fa-plus"></i> إضافة صنف يدوي
+                </button>
+            </div>
+            
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 40%;">الصنف</th>
+                            <th style="width: 25%;">المتوفر بالمخزن</th>
+                            <th style="width: 15%;">الكمية</th>
+                            <th style="width: 20%;">الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ingredientsTableBody"></tbody>
+                </table>
+                <div id="noIngredientsMsg" style="text-align: center; margin-top: 10px;">لا توجد أصناف لعرضها</div>
+            </div>
+        </div>
+        <!-- أزرار التأكيد داخل المودال -->
+        <div class="modal-footer">
+            <div class="modal-actions">
+                <button id="confirmSaveMealExport" class="save-btn" onclick="mealExport.confirmSaveMealExport()">
+                    <i class="fas fa-save"></i> تأكيد الحفظ
+                </button>
+                <button class="cancel-btn" onclick="mealExport.closeMealIngredientsModal()">
+                    <i class="fas fa-times"></i> إلغاء
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- ✅ نافذة استبدال الصنف -->
+    <div id="replaceIngredientModal" class="modal-overlay" style="display: none; z-index: 2000;">
+        <div class="modal-content custom-modal">
+            <button class="close-button" onclick="document.getElementById('replaceIngredientModal').style.display='none'">×</button>
+            <h2 class="modal-title">استبدال صنف</h2>
+            <div class="form-group">
+                <label for="replaceIngredientSelect">الصنف</label>
+                <select id="replaceIngredientSelect" class="form-input">
+                    <option disabled selected>اختر الصنف</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="replaceIngredientUnit">الوحدة</label>
+                <input type="text" id="replaceIngredientUnit" class="form-input" readonly />
+            </div>
+            <div class="form-group">
+                <label for="replaceIngredientQtyInput">الكمية</label>
+                <input type="number" id="replaceIngredientQtyInput" class="form-input" step="0.01" />
+            </div>
+            <div class="form-actions">
+                <button class="confirm-button" onclick="mealExport.replaceIngredientInExport()">إضافة الصنف</button>
+                <button class="cancel-button" onclick="document.getElementById('replaceIngredientModal').style.display='none'">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ✅ مودال إضافة صنف يدوي -->
+    <div id="manualIngredientModal" class="modal-overlay" style="display: none; z-index: 2000;">
+        <div class="modal-content custom-modal">
+            <button class="close-button" onclick="document.getElementById('manualIngredientModal').style.display='none'">×</button>
+            <h2 class="modal-title">إضافة صنف يدوي</h2>
+            <div class="form-group">
+                <label for="manualIngredientSelect">الصنف</label>
+                <select id="manualIngredientSelect" class="form-input">
+                    <option disabled selected>اختر الصنف</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="manualIngredientUnit">الوحدة</label>
+                <input type="text" id="manualIngredientUnit" class="form-input" readonly />
+            </div>
+            <div class="form-group">
+                <label for="manualIngredientQtyInput">الكمية</label>
+                <input type="number" id="manualIngredientQtyInput" class="form-input" step="0.01" />
+            </div>
+            <div class="form-actions">
+                <button class="confirm-button" onclick="mealExport.addManualIngredientNew()">إضافة</button>
+                <button class="cancel-button" onclick="document.getElementById('manualIngredientModal').style.display='none'">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api_calls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script type="module" src="js/user.js"></script>
+</body>
+</html>

@@ -1,7 +1,4 @@
-const database = require('better-sqlite3')
-const fs = require('fs')
-const path = require('path')
-const { get_db } = require('../shared.js')
+import { get_db } from '../shared.js'
 
 function get_import_count(hos_id) {
     const db = get_db();
@@ -83,7 +80,8 @@ function delete_Import(import_id) {
     delete_import.run(import_id)
     db.close()
 }
-module.exports = {
+
+export {
     get_import_count,
     get_hospital_imports,
     get_supplier_imports,
@@ -93,4 +91,12 @@ module.exports = {
     get_all_import_ingredients
 }
 
-console.log(get_all_import_ingredients(1))
+export default {
+    get_import_count,
+    get_hospital_imports,
+    get_supplier_imports,
+    add_import,
+    update_import,
+    delete_Import,
+    get_all_import_ingredients
+}

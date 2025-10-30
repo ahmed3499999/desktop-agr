@@ -1,12 +1,9 @@
-const Database = require('better-sqlite3')
-const path = require('path')
-const filePath = path.join(__dirname, 'agr.db');
+import Database from 'better-sqlite3'
+import path from 'path'
+import { fileURLToPath } from 'url'
 
-function get_db(){
-    const db = new Database(filePath)
+
+export function get_db(){
+    const db = new Database("D:/agr.db")
     return db
-}
-
-module.exports = {
-    get_db
 }
