@@ -22,147 +22,147 @@ DROP TABLE IF EXISTS PerishedHistory;
 DROP TABLE IF EXISTS Hospitals;
 
 CREATE TABLE Hospitals (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    name TEXT NOT NULL
 );
 
 CREATE TABLE Users (
-    username TEXT PRIMARY KEY,
-    password TEXT,
-    hos_id INTEGER,
+    username TEXT PRIMARY KEY NOT NULL,
+    password TEXT NOT NULL,
+    hos_id INTEGER NOT NULL,
     FOREIGN KEY (hos_id) REFERENCES Hospitals(id) ON DELETE CASCADE
 );
 
 CREATE TABLE Ingredients (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    hos_id INTEGER,
-    name TEXT,
-    unit TEXT,
-    return_cost REAL,
-    quantity INTEGER,
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    hos_id INTEGER NOT NULL,
+    name TEXT NOT NULL,
+    unit TEXT NOT NULL,
+    return_cost REAL NOT NULL DEFAULT 0.00,
+    quantity INTEGER NOT NULL DEFAULT 0,
     FOREIGN KEY (hos_id) REFERENCES Hospitals(id) ON DELETE CASCADE
 );
 
 CREATE TABLE ReturnsHistory (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    hos_id INTEGER,
-    date TEXT,
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    hos_id INTEGER NOT NULL,
+    date TEXT NOT NULL,
     FOREIGN KEY (hos_id) REFERENCES Hospitals(id) ON DELETE CASCADE
 );
 
 CREATE TABLE ReturnsIngredients (
-    return_id INTEGER,
-    ingredient_id INTEGER,
-    quantity INTEGER,
+    return_id INTEGER NOT NULL,
+    ingredient_id INTEGER NOT NULL,
+    quantity INTEGER NOT NULL,
     PRIMARY KEY (return_id, ingredient_id),
     FOREIGN KEY (return_id) REFERENCES ReturnsHistory(id) ON DELETE CASCADE,
     FOREIGN KEY (ingredient_id) REFERENCES Ingredients(id)
 );
 
 CREATE TABLE PerishedHistory (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    hos_id INTEGER,
-    date TEXT,
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    hos_id INTEGER NOT NULL,
+    date TEXT NOT NULL,
     FOREIGN KEY (hos_id) REFERENCES Hospitals(id) ON DELETE CASCADE
 );
 
 CREATE TABLE PerishedIngredients (
-    perished_id INTEGER,
-    ingredient_id INTEGER,
-    quantity INTEGER,
+    perished_id INTEGER NOT NULL,
+    ingredient_id INTEGER NOT NULL,
+    quantity INTEGER NOT NULL,
     PRIMARY KEY (perished_id, ingredient_id),
     FOREIGN KEY (perished_id) REFERENCES PerishedHistory(id) ON DELETE CASCADE,
     FOREIGN KEY (ingredient_id) REFERENCES Ingredients(id)
 );
 
 CREATE TABLE Schedules (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    hos_id INTEGER,
-    patient_type TEXT,
-    schedule_name TEXT,
-    note TEXT,
-    cost REAL,
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    hos_id INTEGER NOT NULL,
+    patient_type TEXT NOT NULL,
+    schedule_name TEXT NOT NULL,
+    note TEXT NOT NULL,
+    cost REAL NOT NULL,
     FOREIGN KEY (hos_id) REFERENCES Hospitals(id) ON DELETE CASCADE
 );
 
 CREATE TABLE Meals (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    schedule_id INTEGER,
-    weekday INTEGER,
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    schedule_id INTEGER NOT NULL,
+    weekday INTEGER NOT NULL,
     UNIQUE (schedule_id, weekday),
     FOREIGN KEY (schedule_id) REFERENCES Schedules(id) ON DELETE CASCADE
 );
 
 CREATE TABLE MealsIngredients (
-    meal_id INTEGER,
-    ingredient_id INTEGER,
-    quantity INTEGER,
+    meal_id INTEGER NOT NULL,
+    ingredient_id INTEGER NOT NULL,
+    quantity INTEGER NOT NULL,
     PRIMARY KEY (meal_id, ingredient_id),
     FOREIGN KEY (meal_id) REFERENCES Meals(id) ON DELETE CASCADE,
     FOREIGN KEY (ingredient_id) REFERENCES Ingredients(id)
 );
 
 CREATE TABLE Suppliers (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT,
-    contact_info TEXT
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    name TEXT NOT NULL,
+    contact_info TEXT NOT NULL
 );
 
 CREATE TABLE ImportsHistory (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    hos_id INTEGER,
-    supplier_id INTEGER,
-    date TEXT,
-    amount_paid REAL,
-    note TEXT,
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    hos_id INTEGER NOT NULL,
+    supplier_id INTEGER NOT NULL,
+    date TEXT NOT NULL,
+    amount_paid REAL NOT NULL,
+    note TEXT NOT NULL,
     FOREIGN KEY (supplier_id) REFERENCES Suppliers(id),
     FOREIGN KEY (hos_id) REFERENCES Hospitals(id) ON DELETE CASCADE
 );
 
 CREATE TABLE ImportsIngredients (
-    import_id INTEGER,
-    ingredient_id INTEGER,
-    quantity INTEGER,
-    unit_cost REAL,
+    import_id INTEGER NOT NULL,
+    ingredient_id INTEGER NOT NULL,
+    quantity INTEGER NOT NULL,
+    unit_cost REAL NOT NULL,
     PRIMARY KEY (import_id, ingredient_id),
     FOREIGN KEY (import_id) REFERENCES ImportsHistory(id) ON DELETE CASCADE,
     FOREIGN KEY (ingredient_id) REFERENCES Ingredients(id)
 );
 
 CREATE TABLE ExportsHistory (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    hos_id INTEGER,
-    destination_hos_id INTEGER,
-    date TEXT,
-    note TEXT,
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    hos_id INTEGER NOT NULL,
+    destination_hos_id INTEGER NOT NULL,
+    date TEXT NOT NULL,
+    note TEXT NOT NULL,
     FOREIGN KEY (hos_id) REFERENCES Hospitals(id) ON DELETE CASCADE,
     FOREIGN KEY (destination_hos_id) REFERENCES Hospitals(id)
 );
 
 CREATE TABLE ExportsIngredients (
-    export_id INTEGER,
-    ingredient_id INTEGER,
-    quantity INTEGER,
+    export_id INTEGER NOT NULL,
+    ingredient_id INTEGER NOT NULL,
+    quantity INTEGER NOT NULL,
     PRIMARY KEY (export_id, ingredient_id),
     FOREIGN KEY (export_id) REFERENCES ExportsHistory(id) ON DELETE CASCADE,
     FOREIGN KEY (ingredient_id) REFERENCES Ingredients(id)
 );
 
 CREATE TABLE ExportsMeals (
-    export_id INTEGER,
-    patient_type TEXT,
-    schedule_name TEXT,
-    quantity INTEGER,
-    cost REAL,
+    export_id INTEGER NOT NULL,
+    patient_type TEXT NOT NULL,
+    schedule_name TEXT NOT NULL,
+    quantity INTEGER NOT NULL,
+    cost REAL NOT NULL,
     FOREIGN KEY (export_id) REFERENCES ExportsHistory(id) ON DELETE CASCADE
 );
 
 CREATE TABLE Payments (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    hos_id INTEGER,
-    date TEXT,
-    purpose TEXT,
-    cost REAL,
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    hos_id INTEGER NOT NULL,
+    date TEXT NOT NULL,
+    purpose TEXT NOT NULL,
+    cost REAL NOT NULL,
     FOREIGN KEY (hos_id) REFERENCES Hospitals(id) ON DELETE CASCADE
 );
 
