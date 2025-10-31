@@ -1,16 +1,30 @@
 let hos_id = 1;
 
+function responsify(func) {
+    return async (...args) => {
+        try {
+            const data = await func(...args);
+            return { status: 200, data };
+            } catch (err) {
+            return { status: 500, error: err.message || String(err) };
+        }
+    };
+}
+
 function getIngredients() {
-    return new Promise((resolve, reject) => resolve(window.ingredientsDB.get_hospital_ingredients(hos_id)))
+    return window.ingredientsDB.get_hospital_ingredients(hos_id)
 };
+getIngredients = responsify(getIngredients);
 
 function addIngredient(name, unit, return_cost = 0, quantity = 0) {
-    return new Promise((resolve, reject) => resolve(window.ingredientsDB.create_ingredient(hos_id, name, unit, return_cost, quantity)))
+    return window.ingredientsDB.create_ingredient(hos_id, name, unit, return_cost, quantity)
 };
+addIngredient = responsify(addIngredient)
 
 function updateIngredient(id, name, unit, return_cost = 0, quantity = 0) {
-    return new Promise((resolve, reject) => resolve(window.ingredientsDB.update_ingredient(id, name, unit, return_cost, quantity)))
+    return window.ingredientsDB.update_ingredient(id, name, unit, return_cost, quantity)
 };
+updateIngredient = responsify(updateIngredient)
 
 // دوال الموردين من اول هنا
 function getSuppliers() {
@@ -50,8 +64,9 @@ function getSupplierImports(supplier_id, limit, offset) {
 // دوال الواردات من اول هنا
 
 function getImports(limit = 100, offset = 0){
-    return new Promise((resolve, reject) => resolve(window.importsDB.get_hospital_imports(1, limit, offset)));
+    return window.importsDB.get_hospital_imports(1, limit, offset);
 }
+getImports = responsify(getImports)
 
 // ingredients is an array of objects, each object contains ingredient_id, unit_cost, quantity
 // example
