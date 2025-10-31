@@ -4,7 +4,6 @@ function get_ingredient(ingredient_id) {
     const db =get_db()
     const st = db.prepare('SELECT * FROM Ingredients WHERE id = ?')
     const row = st.get(ingredient_id)
-    db.close()
     return row
 }
 
@@ -12,29 +11,32 @@ function get_hospital_ingredients(hos_id) {
     const db = get_db()
     const st = db.prepare('SELECT * FROM Ingredients WHERE hos_id = ?')
     const rows = st.all(hos_id)
-    db.close()
     return rows
 }
+
 function create_ingredient(hos_id,name,unit,return_cost , quantity){
     const db = get_db()
     const st = db.prepare('INSERT INTO Ingredients (hos_id, name, unit , return_cost, quantity) values (?,?,?,?,?)')
     const info = st.run(hos_id,name,unit,return_cost , quantity)
     const ingredient_id = info.lastInsertRowid
-    db.close()
-    return ingredient_id
+    return {"id":ingredient_id}
 }
 
 function update_ingredient(ingredient_id,name,unit,return_cost , quantity){
     const db = get_db()
     const st = db.prepare('UPDATE Ingredients SET name = ?, unit = ?, return_cost = ?, quantity = ? WHERE id = ?')
     st.run(name,unit,return_cost , quantity, ingredient_id)
-    db.close()
 }
 function delete_ingredient(ingredient_id){
     const db = get_db()
     const st = db.prepare('DELETE FROM Ingredients WHERE id = ?')
     st.run(ingredient_id)
-    db.close()
+}
+
+function update_ingredient_quantity(ingredient_id, quantity){
+    const db = get_db()
+    const st = db.prepare('UPDATE Ingredients SET quantity = ? + quantity WHERE id = ?')
+    st.run(quantity, ingredient_id)
 }
 
 export {
@@ -42,7 +44,8 @@ export {
     get_hospital_ingredients,
     create_ingredient,
     update_ingredient,
-    delete_ingredient
+    delete_ingredient,
+    update_ingredient_quantity
 }
 
 export default {
