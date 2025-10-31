@@ -1,6 +1,7 @@
 import { contextBridge } from 'electron';
 import * as ingredientsDB from '../main/db/hospital/ingredients';
 import * as importsDB from '../main/db/hospital/imports';
+import * as importsDB from '../main/db/hospital/returns';
 
 contextBridge.exposeInMainWorld('importsDB', {
   get_import_count: (hos_id) => importsDB.get_import_count(hos_id),
@@ -18,4 +19,13 @@ contextBridge.exposeInMainWorld('ingredientsDB', {
   create_ingredient: (hos_id, name, unit, return_cost, quantity) => ingredientsDB.create_ingredient(hos_id, name, unit, return_cost, quantity),
   update_ingredient: (ingredient_id, name, unit, return_cost, quantity) => ingredientsDB.update_ingredient(ingredient_id, name, unit, return_cost, quantity),
   delete_ingredient: (ingredient_id) => ingredientsDB.delete_ingredient(ingredient_id)
+})
+
+contextBridge.exposeInMainWorld('returnsDB', {
+  get_ingredients_return: (return_id) => returnsDB.get_ingredients_return(return_id),
+  get_hospital_returns: (hos_id, limit, offset) => returnsDB.get_hospital_returns(hos_id, limit, offset),
+  get_returns_count: (hos_id) => returnsDB.get_returns_count(hos_id),
+  create_return: (hos_id, ingredients, date) => returnsDB.create_return(hos_id, ingredients, date),
+  delete_return: (return_id) => returnsDB.delete_return(return_id),
+  update_return: (return_id, ingredients, date) => returnsDB.update_return(return_id, ingredients, date)
 })

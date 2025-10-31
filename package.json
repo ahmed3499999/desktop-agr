@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "name": "electron-app",
   "version": "1.0.0",
   "description": "A minimal Electron application with JavaScript",
