@@ -39,7 +39,7 @@ CREATE TABLE Ingredients (
     name TEXT NOT NULL,
     unit TEXT NOT NULL,
     return_cost REAL NOT NULL DEFAULT 0.00,
-    quantity INTEGER NOT NULL DEFAULT 0,
+    quantity REAL NOT NULL DEFAULT 0,
     FOREIGN KEY (hos_id) REFERENCES Hospitals(id) ON DELETE CASCADE
 );
 
@@ -53,7 +53,7 @@ CREATE TABLE ReturnsHistory (
 CREATE TABLE ReturnsIngredients (
     return_id INTEGER NOT NULL,
     ingredient_id INTEGER NOT NULL,
-    quantity INTEGER NOT NULL,
+    quantity REAL NOT NULL,
     PRIMARY KEY (return_id, ingredient_id),
     FOREIGN KEY (return_id) REFERENCES ReturnsHistory(id) ON DELETE CASCADE,
     FOREIGN KEY (ingredient_id) REFERENCES Ingredients(id)
@@ -69,7 +69,7 @@ CREATE TABLE PerishedHistory (
 CREATE TABLE PerishedIngredients (
     perished_id INTEGER NOT NULL,
     ingredient_id INTEGER NOT NULL,
-    quantity INTEGER NOT NULL,
+    quantity REAL NOT NULL,
     PRIMARY KEY (perished_id, ingredient_id),
     FOREIGN KEY (perished_id) REFERENCES PerishedHistory(id) ON DELETE CASCADE,
     FOREIGN KEY (ingredient_id) REFERENCES Ingredients(id)
@@ -80,7 +80,7 @@ CREATE TABLE Schedules (
     hos_id INTEGER NOT NULL,
     patient_type TEXT NOT NULL,
     schedule_name TEXT NOT NULL,
-    note TEXT NOT NULL,
+    note TEXT NOT NULL DEFAULT "",
     cost REAL NOT NULL,
     FOREIGN KEY (hos_id) REFERENCES Hospitals(id) ON DELETE CASCADE
 );
@@ -96,7 +96,7 @@ CREATE TABLE Meals (
 CREATE TABLE MealsIngredients (
     meal_id INTEGER NOT NULL,
     ingredient_id INTEGER NOT NULL,
-    quantity INTEGER NOT NULL,
+    quantity REAL NOT NULL,
     PRIMARY KEY (meal_id, ingredient_id),
     FOREIGN KEY (meal_id) REFERENCES Meals(id) ON DELETE CASCADE,
     FOREIGN KEY (ingredient_id) REFERENCES Ingredients(id)
@@ -122,7 +122,7 @@ CREATE TABLE ImportsHistory (
 CREATE TABLE ImportsIngredients (
     import_id INTEGER NOT NULL,
     ingredient_id INTEGER NOT NULL,
-    quantity INTEGER NOT NULL,
+    quantity REAL NOT NULL,
     unit_cost REAL NOT NULL,
     PRIMARY KEY (import_id, ingredient_id),
     FOREIGN KEY (import_id) REFERENCES ImportsHistory(id) ON DELETE CASCADE,
@@ -132,7 +132,7 @@ CREATE TABLE ImportsIngredients (
 CREATE TABLE ExportsHistory (
     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     hos_id INTEGER NOT NULL,
-    destination_hos_id INTEGER NOT NULL,
+    destination_hos_id INTEGER DEFAULT NULL,
     date TEXT NOT NULL,
     note TEXT NOT NULL,
     FOREIGN KEY (hos_id) REFERENCES Hospitals(id) ON DELETE CASCADE,
@@ -142,7 +142,7 @@ CREATE TABLE ExportsHistory (
 CREATE TABLE ExportsIngredients (
     export_id INTEGER NOT NULL,
     ingredient_id INTEGER NOT NULL,
-    quantity INTEGER NOT NULL,
+    quantity REAL NOT NULL,
     PRIMARY KEY (export_id, ingredient_id),
     FOREIGN KEY (export_id) REFERENCES ExportsHistory(id) ON DELETE CASCADE,
     FOREIGN KEY (ingredient_id) REFERENCES Ingredients(id)
@@ -152,7 +152,7 @@ CREATE TABLE ExportsMeals (
     export_id INTEGER NOT NULL,
     patient_type TEXT NOT NULL,
     schedule_name TEXT NOT NULL,
-    quantity INTEGER NOT NULL,
+    quantity REAL NOT NULL,
     cost REAL NOT NULL,
     FOREIGN KEY (export_id) REFERENCES ExportsHistory(id) ON DELETE CASCADE
 );
