@@ -1,6 +1,12 @@
 import {get_db} from '../shared.js'
 import {get_ingredient,update_ingredient_quantity} from './ingredients.js'
 
+function get_exports_count(hos_id) {
+    const db = get_db()
+    const st=db.prepare("SELECT COUNT(*) FROM ExportsHistory WHERE hos_id = ?")
+    const row=st.get(hos_id)
+    return row['COUNT(*)']
+}
 function get_export_meals(export_id) {
     const db = get_db()
     const get_meals = db.prepare("SELECT * FROM ExportsMeals WHERE export_id = ?")
@@ -26,13 +32,7 @@ function get_exports(hos_id, limit, offset) {
         rows[i]['meals']=get_export_meals(rows[i]['id'])
         rows[i]['ingredients']=get_export_ingredients(rows[i]['id'])
     }
-    return rows
-}
-function get_exports_count(hos_id) {
-    const db = get_db()
-    const st=db.prepare("SELECT COUNT(*) FROM ExportsHistory WHERE hos_id = ?")
-    const row=st.get(hos_id)
-    return row['COUNT(*)']
+    return {data:rows,count:get_exports_count(hos_id)};
 }
 
 function create_export(hos_id,dest_hos_id,note,date,meeals,ingredients) {

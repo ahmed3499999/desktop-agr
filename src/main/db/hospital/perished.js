@@ -1,6 +1,13 @@
 import { get_db } from "../shared.js";
 import { get_ingredient,update_ingredient_quantity} from "./ingredients.js";
 
+function get_perished_count(hos_id) {
+    const db = get_db();
+    const st = db.prepare('SELECT COUNT(*) as count FROM PerishedHistory WHERE hos_id = ?');
+    const row = st.get(hos_id);
+    return row.count;
+}
+
 function get_all_perished_ingredients(perished_id){
     const db = get_db();
     const st =db.prepare('SELECT ingredient_id, quantity FROM PerishedIngredients WHERE perished_id = ?');
@@ -34,14 +41,9 @@ function get_hospital_perished(hos_id, limit, offset) {
             ingredients: perished_ingredients
         });
     }
-    return perisheds;
+    return {data:perisheds,count:get_perished_count(hos_id)};
 }
-function get_perished_count(hos_id) {
-    const db = get_db();
-    const st = db.prepare('SELECT COUNT(*) as count FROM PerishedHistory WHERE hos_id = ?');
-    const row = st.get(hos_id);
-    return row.count;
-}
+
 function create_perished(hos_id, ingredients, date) {
     const db = get_db();    
     const transaction = get_db().transaction(() => {

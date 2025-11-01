@@ -1,6 +1,7 @@
 import { get_db } from "../shared.js";
 import { get_ingredient,update_ingredient_quantity} from "./ingredients.js";
 
+
 function get_ingredients_return(return_id) {
     const db = get_db();
     const st =db.prepare('SELECT ingredient_id, quantity FROM ReturnsIngredients WHERE return_id = ?');
@@ -17,6 +18,13 @@ function get_ingredients_return(return_id) {
         });
     }
     return return_ingredients;
+}
+
+function get_returns_count(hos_id) {
+    const db = get_db();
+    const st = db.prepare('SELECT COUNT(*) as count FROM ReturnsHistory WHERE hos_id = ?');
+    const row = st.get(hos_id);
+    return row.count;
 }
 
 function get_hospital_returns(hos_id,limit, offset) {
@@ -36,14 +44,7 @@ function get_hospital_returns(hos_id,limit, offset) {
             ingredients: return_ingredients
         });
     }
-    return returns;
-}
-
-function get_returns_count(hos_id) {
-    const db = get_db();
-    const st = db.prepare('SELECT COUNT(*) as count FROM Returns WHERE hos_id = ?');
-    const row = st.get(hos_id);
-    return row.count;
+    return {data:returns,count:get_returns_count(hos_id)};
 }
 
 function create_return(hos_id, ingredients, date) {
