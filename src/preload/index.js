@@ -3,6 +3,7 @@ import * as ingredientsDB from '../main/db/hospital/ingredients';
 import * as importsDB from '../main/db/hospital/imports';
 import * as returnsDB from '../main/db/hospital/returns';
 import * as exportsDB from '../main/db/hospital/exports';
+import * as perishedDB from '../main/db/hospital/perished';
 
 contextBridge.exposeInMainWorld('importsDB', {
   get_import_count: (hos_id) => importsDB.get_import_count(hos_id),
@@ -39,4 +40,12 @@ contextBridge.exposeInMainWorld('exportsDB', {
   update_export: (export_id, dest_hos_id, note, date, meeals, ingredients) => exportsDB.update_export(export_id, dest_hos_id, note, date, meeals, ingredients),
   get_export_meals: (export_id) => exportsDB.get_export_meals(export_id),
   get_export_ingredients: (export_id) => exportsDB.get_export_ingredients(export_id)
+});
+
+contextBridge.exposeInMainWorld('perishedDB', {
+  get_hospital_perished: (hos_id, limit, offset) => perishedDB.get_hospital_perished(hos_id, limit, offset),
+  get_perished_count: (hos_id) => perishedDB.get_perished_count(hos_id),
+  create_perished: (hos_id, ingredients, date) => perishedDB.create_perished(hos_id, ingredients, date),
+  delete_perished: (perished_id) => perishedDB.delete_perished(perished_id),
+  update_perished: (perished_id, ingredients, date) => perishedDB.update_perished(perished_id, ingredients, date)
 });
