@@ -4,6 +4,8 @@ import * as importsDB from '../main/db/hospital/imports';
 import * as returnsDB from '../main/db/hospital/returns';
 import * as exportsDB from '../main/db/hospital/exports';
 import * as perishedDB from '../main/db/hospital/perished';
+import * as paymentsDB from '../main/db/hospital/payments';
+import * as schedulesDB from '../main/db/hospital/schedules';
 
 contextBridge.exposeInMainWorld('importsDB', {
   get_import_count: (hos_id) => importsDB.get_import_count(hos_id),
@@ -49,3 +51,20 @@ contextBridge.exposeInMainWorld('perishedDB', {
   delete_perished: (perished_id) => perishedDB.delete_perished(perished_id),
   update_perished: (perished_id, ingredients, date) => perishedDB.update_perished(perished_id, ingredients, date)
 });
+
+contextBridge.exposeInMainWorld('paymentsDB', {
+  get_payment: (hos_id, limit, offset) => paymentsDB.get_payment(hos_id, limit, offset),
+  create_payment: (hos_id, date, purpose, cost) => paymentsDB.create_payment(hos_id, date, purpose, cost),
+  delete_payment: (payment_id) => paymentsDB.delete_payment(payment_id),
+  update_payment: (payment_id, date, purpose, cost) => paymentsDB.update_payment(payment_id, date, purpose, cost)
+});
+
+contextBridge.exposeInMainWorld('schedulesDB', {
+  get_hospital_schedules: (hos_id) => schedulesDB.get_hospital_schedules(hos_id),
+  create_schedule: (hos_id, patient_type, schedule_name, note, cost) => schedulesDB.create_schedule(hos_id, patient_type, schedule_name, note, cost),
+  delete_schedule: (schedule_id) => schedulesDB.delete_schedule(schedule_id),
+  update_schedule: (schedule_id,  schedule_name,patient_type, note, cost) => schedulesDB.update_schedule(schedule_id,  schedule_name,patient_type, note, cost),
+  create_schedule_meal: (schedule_id, weekday, ingredients) => schedulesDB.create_schedule_meal(schedule_id, weekday, ingredients),
+  update_schedule_meal: (meal_id, ingredients) => schedulesDB.update_schedule_meal(meal_id, ingredients)
+});
+
