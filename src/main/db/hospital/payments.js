@@ -24,7 +24,7 @@ function create_payment(hos_id, date, purpose, cost) {
     const db = get_db()
     const st = db.prepare('INSERT INTO payments (hos_id, date, purpose, cost) values (?,?,?,?)')
     const info = st.run(hos_id, date, purpose, cost)
-    return info.lastInsertRowid
+    return {'id':info.lastInsertRowid}
 }
 
 

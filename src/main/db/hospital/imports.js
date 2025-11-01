@@ -4,7 +4,6 @@ function get_import_count(hos_id) {
     const db = get_db();
     const st = db.prepare('  SELECT COUNT(*) FROM ImportsHistory WHERE hos_id = ? AND id IN (SELECT import_id FROM ImportsIngredients)')
     const row = st.get(hos_id)
-    db.close()
     return row['COUNT(*)']
 }
 
@@ -13,7 +12,6 @@ function get_all_import_ingredients(hos_id) {
     const db = get_db();
     const st = db.prepare('SELECT ingredient_id,quantity,unit_cost FROM ImportsIngredients WHERE import_id = ?')
     const rows = st.all(hos_id)
-    db.close()
     return rows
 }
 
@@ -24,7 +22,6 @@ function get_supplier_imports(hos_id, supplier_id, limit, offset) {
     for (let i = 0; i < rows.length; i++) {
         rows[i]['ingredients'] = get_all_import_ingredients(rows[i]['id'])
     }
-    db.close()
     return {data:rows,count:get_import_count(hos_id)}
 }
 
@@ -35,7 +32,6 @@ function get_hospital_imports(hos_id, limit, offset) {
     for (let i = 0; i < rows.length; i++) {
         rows[i]['ingredients'] = get_all_import_ingredients(rows[i]['id'])
     }
-    db.close()
     return {data:rows,count:get_import_count(hos_id)}
 }
 
@@ -51,8 +47,7 @@ function add_import(supplier_id, hos_id, date, ingredients, amount_paid, note) {
         }
     })
     insert_ingredient_transaction(ingredients)
-    db.close()
-    return import_id
+    return {'id':import_id}
 }
 
 function update_import(import_id, supplier_id, date, ingredients, amount_paid, note) {
@@ -68,7 +63,6 @@ function update_import(import_id, supplier_id, date, ingredients, amount_paid, n
         }
     })
     insert_ingredient_transaction(ingredients)
-    db.close()
     return import_id
 }
 
@@ -78,7 +72,6 @@ function delete_Import(import_id) {
     delete_ingredients.run(import_id)
     const delete_import = db.prepare("DELETE FROM ImportsHistory WHERE id = ?")
     delete_import.run(import_id)
-    db.close()
 }
 
 export {
