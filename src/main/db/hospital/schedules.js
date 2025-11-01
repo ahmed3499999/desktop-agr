@@ -48,7 +48,7 @@ function create_schedule(hos_id, patient_type, schedule_name, note, cost) {
     const db = get_db();
     const st = db.prepare('INSERT INTO Schedules (hos_id, patient_type, schedule_name, note, cost) VALUES (?,?,?,?,?)');
     const info = st.run(hos_id, patient_type, schedule_name, note, cost);
-    return info.lastInsertRowid;
+    return {'id':info.lastInsertRowid};
 }
 
 function delete_schedule(schedule_id) {

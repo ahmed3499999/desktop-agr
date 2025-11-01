@@ -52,6 +52,7 @@ function create_export(hos_id,dest_hos_id,note,date,meeals,ingredients) {
         }
     })
     transaction()
+    return{'id':export_id};
 }
 // create_export(1,1,"note","2024-10-10",[{patient_type:"adult",schedule_name:"standard",qunatity:10,cost:5}],[{ingredient_id:1,quantity:2}])
 

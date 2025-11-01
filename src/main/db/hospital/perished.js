@@ -57,7 +57,7 @@ function create_perished(hos_id, ingredients, date) {
             st2.run(perished_id, ingredients[i].ingredient_id, ingredients[i].quantity);
             update_ingredient_quantity(ingredients[i].ingredient_id, -ingredients[i].quantity);
         }
-        return perished_id;
+        return {'id':perished_id};
     });
     return transaction();
 }
