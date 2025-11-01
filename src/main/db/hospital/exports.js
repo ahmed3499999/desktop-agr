@@ -1,5 +1,5 @@
 import {get_db} from '../shared.js'
-import {get_ingredient,update_ingredient_quantity} from '../ingredients/imports.js'
+import {get_ingredient,update_ingredient_quantity} from './ingredients.js'
 
 function get_export_meals(export_id) {
     const db = get_db()
@@ -10,7 +10,7 @@ function get_export_meals(export_id) {
 
 function get_export_ingredients(export_id) {
     const db = get_db()
-    const st=db.prepare("SELECT * FROM ExportsIngredients WHERE export_id = %s")
+    const st=db.prepare("SELECT * FROM ExportsIngredients WHERE export_id = ?")
     let rows=st.all(export_id)
     for (let i=0;i<rows.length;i++) {
         rows[i]['ingredient']=get_ingredient(rows[i]['ingredient_id'])
@@ -53,6 +53,8 @@ function create_export(hos_id,dest_hos_id,note,date,meeals,ingredients) {
     })
     transaction()
 }
+// create_export(1,1,"note","2024-10-10",[{patient_type:"adult",schedule_name:"standard",qunatity:10,cost:5}],[{ingredient_id:1,quantity:2}])
+
 function delete_export(export_id) {
     const db = get_db()
     const transaction = db.transaction(() => {
@@ -65,6 +67,7 @@ function delete_export(export_id) {
     })
     transaction()
 }
+
 function update_export(export_id, dest_hos_id, note, date, meeals, ingredients) {
     const db = get_db()
     const transaction = db.transaction(() => {
@@ -72,7 +75,7 @@ function update_export(export_id, dest_hos_id, note, date, meeals, ingredients) 
         st.run(dest_hos_id, note, date, export_id)
         const st2 = db.prepare("DELETE FROM ExportsMeals WHERE export_id = ?")
         st2.run(export_id)
-        const st_meals = db.prepare("INSERT INTO ExportsMeals  VALUES (?,?,?,?)")
+        const st_meals = db.prepare("INSERT INTO ExportsMeals  VALUES (?,?,?,?,?)")
         for (let i = 0; i < meeals.length; i++) {
             st_meals.run(export_id, meeals[i].patient_type, meeals[i].schedule_name, meeals[i].qunatity, meeals[i].cost)
         }
