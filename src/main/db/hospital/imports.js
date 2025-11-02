@@ -1,4 +1,5 @@
 import { get_db } from '../shared.js'
+import {get_ingredient} from './ingredients.js'
 
 function get_import_count(hos_id) {
     const db = get_db();
@@ -11,7 +12,19 @@ function get_all_import_ingredients(hos_id) {
     const db = get_db();
     const st = db.prepare('SELECT ingredient_id,quantity,unit_cost FROM ImportsIngredients WHERE import_id = ?')
     const rows = st.all(hos_id)
-    return rows
+    if (rows.length === 0) {
+        return []
+    }
+    import_ingredients = []
+    for (let i = 0; i < rows.length; i++) {
+        let ingredient = get_ingredient(rows[i]['ingredient_id'])
+        import_ingredients.push({
+            'ingredient': ingredient,
+            'quantity': rows[i]['quantity'],
+            'unit_cost': rows[i]['unit_cost']
+        })
+    }
+    return import_ingredients
 }
 
 function get_supplier_imports(hos_id, supplier_id, limit, offset) {
