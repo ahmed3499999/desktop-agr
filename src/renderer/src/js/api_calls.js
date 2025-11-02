@@ -84,7 +84,7 @@ getImports = responsify(getImports)
 // ]
 
 function addImport(supplier_id, date, amount_paid, ingredients = [], note = "") {
-    return window.importsDB.add_import(supplier_id, hos_id, date, ingredients, amount_paid, note);
+    return window.importsDB.add_import(supplier_id, hos_id(), date, ingredients, amount_paid, note);
 }
 addImport = responsify(addImport);
 
@@ -207,7 +207,7 @@ function addExport(date, meals, ingredients, note = '', dest_hos_id = null) {
 addExport = responsify(addExport);
 
 function updateExport(export_id, date, meals, ingredients, note = '', dest_hos_id = null) {
-    return window.exportsDB.update_export(export_id, hos_id, dest_hos_id, note, date, meals, ingredients);
+    return window.exportsDB.update_export(export_id, hos_id(), dest_hos_id, note, date, meals, ingredients);
 }
 updateExport = responsify(updateExport);
 
@@ -237,7 +237,7 @@ function update_hospital(hos_id, hospital_name) {
 update_hospital = responsify(update_hospital);
 
 function delete_hospital(hos_id) {
-    return window.hospitalsDB.delete_hospital(hos_id());
+    return window.hospitalsDB.delete_hospital(hos_id);
 }
 delete_hospital = responsify(delete_hospital);
 

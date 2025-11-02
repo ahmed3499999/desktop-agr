@@ -15,7 +15,7 @@ function get_all_import_ingredients(hos_id) {
     if (rows.length === 0) {
         return []
     }
-    import_ingredients = []
+    const import_ingredients = []
     for (let i = 0; i < rows.length; i++) {
         let ingredient = get_ingredient(rows[i]['ingredient_id'])
         import_ingredients.push({
