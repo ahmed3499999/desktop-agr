@@ -24,12 +24,13 @@ function get_ingredients_return(return_id) {
             quantity: rows[i].quantity
         });
     }
-    return {'data':return_ingredients,count:get_returns_count(hos_id)};
+    return return_ingredients;
 }
 
 
 
 function get_hospital_returns(hos_id,limit, offset) {
+    console.log("Fetching returns for hospital ID:", hos_id, "with limit:", limit, "and offset:", offset);
     const db = get_db();
     const st = db.prepare('SELECT * FROM ReturnsHistory WHERE hos_id = ? LIMIT ? OFFSET ?');
     const rows = st.all(hos_id, limit, offset);

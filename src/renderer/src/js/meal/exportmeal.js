@@ -1,4 +1,4 @@
-import * as commonfunction from "../../commonfunction.js";
+import * as commonfunction from "../commonfunction.js";
 
 console.log("Meal Export Module Loaded");
 
@@ -7,7 +7,7 @@ let currentIngredientsData = [];
 
 let savedMealExports = [];
 let currentPage = 1;
-const pageSize = 5; // عدد فواتير التصدير في كل صفحة
+const pageSize = 8; // عدد فواتير التصدير في كل صفحة
 
 export function getCurrentMealExportItems() {
   return currentMealExportItems;

@@ -7,7 +7,6 @@ function get_import_count(hos_id) {
     return row['COUNT(*)']
 }
 
-
 function get_all_import_ingredients(hos_id) {
     const db = get_db();
     const st = db.prepare('SELECT ingredient_id,quantity,unit_cost FROM ImportsIngredients WHERE import_id = ?')

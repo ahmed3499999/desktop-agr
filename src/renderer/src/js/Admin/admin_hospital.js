@@ -180,7 +180,7 @@ function attachEditDeleteEvents() {
       });
 
       requestAnimationFrame(() => {
-        window.location.href = "user.html";
+        window.location.href = "./src/user.html";
       });
     });
   });

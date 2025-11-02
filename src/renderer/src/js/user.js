@@ -10,12 +10,10 @@ if (!hospitalName || hospitalName === "null" || hospitalName === "undefined") {
 console.log("💾 All sessionStorage data at start:", { ...sessionStorage });
 console.log("📌 Hospital Name on USER page (early check):", hospitalName);
 
-import { isAuthenticated_userpage } from "./auth.js";
 import * as commonfunction from "./commonfunction.js";
 import * as item from "./storage/item.js";
 
 // ✅ التحقق بعد ما نقرأ البيانات
-isAuthenticated_userpage();
 
 document.addEventListener('DOMContentLoaded', () => {
     const hamburgerMenu = document.querySelector('.hamburger-menu');
@@ -609,7 +607,7 @@ async function createSchedule() {
   try {
     commonfunction.showLoading(true);
     const res = await addSchedule(patientType, scheduleName, note || "", cost);
-    if (res && res.status === 201) {
+    if (res && res.status === 200) {
       document.getElementById("patientTypeInput").value = "";
       scheduleSelect.value = "";
       document.getElementById("customScheduleInput").value = "";

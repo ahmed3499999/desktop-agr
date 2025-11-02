@@ -14,7 +14,7 @@ function get_export_meals(export_id) {
     return meals
 }
 
-function get_export_ingredients(export_id) {
+function get_export_ingredients(export_id) {    
     const db = get_db()
     const st=db.prepare("SELECT * FROM ExportsIngredients WHERE export_id = ?")
     let rows=st.all(export_id)

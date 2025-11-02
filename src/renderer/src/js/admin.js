@@ -1,11 +1,11 @@
 import * as commonfunction from "./commonfunction.js";
+sessionStorage.setItem("hos_id", 1);
 
 document.addEventListener('DOMContentLoaded', () => {
     const hamburgerMenu = document.querySelector('.hamburger-menu');
     const mobileSidebar = document.getElementById('mobileSidebar');
     const closeSidebar = document.getElementById('closeSidebar');
     const mobileOverlay = document.getElementById('mobileOverlay');
-    hos_id = 1;
 
     hamburgerMenu.addEventListener('click', () => {
         mobileSidebar.classList.add('active');
