@@ -32,18 +32,19 @@ function get_exports(hos_id, limit, offset) {
         rows[i]['meals']=get_export_meals(rows[i]['id'])
         rows[i]['ingredients']=get_export_ingredients(rows[i]['id'])
     }
-    return {data:rows,count:get_exports_count(hos_id)};
+    return {data:rows,total:get_exports_count(hos_id)};
 }
 
 function create_export(hos_id,dest_hos_id,note,date,meeals,ingredients) {
     const db = get_db()
+    let export_id = null;
     const transaction = db.transaction(() => {
         const st = db.prepare("INSERT INTO ExportsHistory (hos_id, destination_hos_id, note, date) VALUES (?, ?, ?, ?)")
         const info = st.run(hos_id, dest_hos_id, note, date)
-        const export_id = info.lastInsertRowid
+        export_id = info.lastInsertRowid
         const st_meals = db.prepare("INSERT INTO ExportsMeals  VALUES (?,?,?,?,?)")
         for (let i = 0; i < meeals.length; i++) {
-            st_meals.run(export_id, meeals[i].patient_type, meeals[i].schedule_name, meeals[i].qunatity, meeals[i].cost)
+            st_meals.run(export_id, meeals[i].patient_type, meeals[i].schedule_name, meeals[i].quantity, meeals[i].cost)
         }
         const st_ingredients = db.prepare("INSERT INTO ExportsIngredients  VALUES (?,?,?)")
         for (let i = 0; i < ingredients.length; i++) {

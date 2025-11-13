@@ -34,7 +34,7 @@ function get_supplier_imports(hos_id, supplier_id, limit, offset) {
     for (let i = 0; i < rows.length; i++) {
         rows[i]['ingredients'] = get_all_import_ingredients(rows[i]['id'])
     }
-    return {data:rows,count:get_import_count(hos_id)}
+    return {data:rows,total:get_import_count(hos_id)}
 }
 
 function get_hospital_imports(hos_id, limit, offset) {
@@ -44,7 +44,7 @@ function get_hospital_imports(hos_id, limit, offset) {
     for (let i = 0; i < rows.length; i++) {
         rows[i]['ingredients'] = get_all_import_ingredients(rows[i]['id'])
     }
-    return {data:rows,count:get_import_count(hos_id)}
+    return {data:rows,total:get_import_count(hos_id)}
 }
 
 function add_import(supplier_id, hos_id, date, ingredients, amount_paid, note) {

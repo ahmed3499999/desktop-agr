@@ -64,7 +64,7 @@ function delete_schedule(schedule_id) {
     const del_schedule_st = db.prepare('DELETE FROM Schedules WHERE id = ?');
     del_schedule_st.run(schedule_id);
 }
-delete_schedule(1);
+
 function update_schedule(schedule_id,  schedule_name,patient_type, note, cost) {
     const db =get_db();
     const st = db.prepare('UPDATE Schedules SET schedule_name = ?, patient_type = ?, note = ?, cost = ? WHERE id = ?');
