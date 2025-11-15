@@ -10,17 +10,13 @@ export function setupHospitalSection() {
     addBtn.replaceWith(newBtn);
     newBtn.addEventListener("click", async () => {
       const name = document.getElementById("hospitalName").value.trim();
-      const username = document.getElementById("hospitalUsername").value.trim();
-      const password = document.getElementById("hospitalPassword").value.trim();
-      if (!name || !username || !password) {
+      if (!name) {
         alert("يرجى ملء جميع الحقول");
         return;
       }
       try {
-        await add_hospital(name, username, password);
+        await add_hospital(name);
         document.getElementById("hospitalName").value = "";
-        document.getElementById("hospitalUsername").value = "";
-        document.getElementById("hospitalPassword").value = "";
         loadHospitals();
       } catch (error) {
         console.error("حدث خطأ أثناء الإضافة:", error);
@@ -37,9 +33,7 @@ export function setupHospitalSection() {
     newSaveBtn.addEventListener("click", async () => {
       const id = document.getElementById("editHospitalId").value;
       const name = document.getElementById("editHospitalName").value;
-      const username = document.getElementById("editHospitalUsername").value;
-      const password = document.getElementById("editHospitalPassword").value;
-      await update_hospital(id, name, username, password || null);
+      await update_hospital(id, name);
       closeEditHospitalModal();
       loadHospitals();
     });
@@ -81,10 +75,9 @@ export async function loadHospitals() {
       const row = document.createElement("tr");
       row.innerHTML = `
         <td>${hospital.hos_name}</td>
-        <td>${hospital.username}</td>
         <td style="display: flex; gap: 4px;">
           <button class="view-btn" data-id="${hospital.hos_id}" data-name="${hospital.hos_name}">عرض</button>
-          <button class="edit-btn" data-id="${hospital.hos_id}" data-name="${hospital.hos_name}" data-username="${hospital.username}">تعديل</button>
+          <button class="edit-btn" data-id="${hospital.hos_id}" data-name="${hospital.hos_name}"">تعديل</button>
           <button class="delete-btn" data-id="${hospital.hos_id}">حذف</button>
         </td>
       `;
@@ -99,9 +92,7 @@ export async function loadHospitals() {
 export async function handleAddHospitalForm(e) {
   e.preventDefault();
   const name = document.getElementById("addHospitalName").value;
-  const username = document.getElementById("addHospitalUsername").value;
-  const password = document.getElementById("addHospitalPassword").value;
-  await add_hospital(name, username, password);
+  await add_hospital(name);
   document.getElementById("addHospitalForm").reset();
   document.getElementById("addHospitalModal").style.display = "none";
   loadHospitals();
@@ -157,11 +148,8 @@ function attachEditDeleteEvents() {
     btn.addEventListener("click", function () {
       const id = this.getAttribute("data-id");
       const name = this.getAttribute("data-name");
-      const username = this.getAttribute("data-username");
       document.getElementById("editHospitalId").value = id;
       document.getElementById("editHospitalName").value = name;
-      document.getElementById("editHospitalUsername").value = username;
-      document.getElementById("editHospitalPassword").value = "";
       document.getElementById("editHospitalModal").style.display = "flex";
       document.body.classList.add("modal-open");
     });
