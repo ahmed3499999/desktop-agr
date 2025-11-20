@@ -16,7 +16,7 @@ function formatDateLocal(date) {
 // ⚡ تحميل الموردين من الـ API
 export async function loadSuppliers() {
   try {
-    const response = await GET(suppliers_endpoint());
+    const response = await getSuppliers();
     if (response && Array.isArray(response.data)) {
       suppliersList = response.data;
       populateSupplierSelect();

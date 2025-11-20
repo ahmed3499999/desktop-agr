@@ -242,81 +242,36 @@ function delete_hospital(hos_id) {
 delete_hospital = responsify(delete_hospital);
 
 function get_supplier_report(supplier_id, start_date, end_date, report_type) {
-    const data = {
-        'supplier_id': supplier_id,
-        'start_date': start_date,
-        'end_date': end_date,
-        'report_type': report_type
-    }
-    
-    return POST(reports_endpoint('supplier'), data);
+    return window.reportsDB.supplierReport(supplier_id, start_date, end_date, report_type);
 }
+get_supplier_report = responsify(get_supplier_report);
 
 function get_returns_report(hospital_id, ingredient_ids, start_date, end_date, report_type) {
-    const data = {
-        'hospital_id': hospital_id,
-        'ingredient_ids': ingredient_ids,
-        'start_date': start_date,
-        'end_date': end_date,
-        'report_type': report_type
-    }
-    
-    return POST(reports_endpoint('returns'), data)
+    return window.reportsDB.returnsReport(hospital_id, ingredient_ids, start_date, end_date, report_type);
 }
+get_returns_report = responsify(get_returns_report);
 
 function get_payments_report(hospital_id, start_date, end_date, report_type) {
-    const data = {
-        'hospital_id': hospital_id,
-        'start_date': start_date,
-        'end_date': end_date,
-        'report_type': report_type
-    }
-
-    return POST(reports_endpoint('payments'), data);
+    return window.reportsDB.paymentsReport(hospital_id, start_date, end_date, report_type);
 }
+get_payments_report = responsify(get_payments_report);
 
 function get_meals_report(hospital_id, start_date, end_date, report_type) {
-    const data = {
-        'hospital_id': hospital_id,
-        'start_date': start_date,
-        'end_date': end_date,
-        'report_type': report_type
-    }
-
-    return POST(reports_endpoint('meals'), data);
+    return window.reportsDB.mealsReport(hospital_id, start_date, end_date, report_type);
 }
-
+get_meals_report = responsify(get_meals_report);
 
 function get_import_report(supplier_id, hospital_id, ingredient_id, start_date, end_date, report_type) {
-    const data = {
-        'supplier_id': supplier_id,
-        'hospital_id': hospital_id,
-        'ingredient_id': ingredient_id,
-        'start_date': start_date,
-        'end_date': end_date,
-        'report_type': report_type
-    }
-    return POST(reports_endpoint('imports'), data);
+    return window.reportsDB.importReport(supplier_id, hospital_id, ingredient_id, start_date, end_date, report_type);
 }
+get_import_report = responsify(get_import_report);
 
 function get_perished_report(hospital_id, ingredient_ids, start_date, end_date, report_type) {
-    const data = {
-        'hospital_id': hospital_id,
-        'ingredient_ids': ingredient_ids,
-        'start_date': start_date,
-        'end_date': end_date,
-        'report_type': report_type
-    }   
-    return POST(reports_endpoint('perished'), data);
+    return window.reportsDB.perishedReport(hospital_id, ingredient_ids, start_date, end_date, report_type);
 }
+get_perished_report = responsify(get_perished_report);
 
 function get_exports_report(hospital_id, ingredient_ids, start_date, end_date, report_type) {
-    const data = {
-        'hospital_id': hospital_id,
-        'ingredient_ids': ingredient_ids,
-        'start_date': start_date,
-        'end_date': end_date,
-        'report_type': report_type
-    }   
-    return POST(reports_endpoint('exports'), data);
+    return window.reportsDB.exportsIngredientsReport(hospital_id, ingredient_ids, start_date, end_date, report_type);
 }
+get_exports_report = responsify(get_exports_report);

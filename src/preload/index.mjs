@@ -8,6 +8,7 @@ import * as paymentsDB from '../main/db/hospital/payments';
 import * as schedulesDB from '../main/db/hospital/schedules';
 import * as suppliersDB from '../main/db/suppliers';
 import * as hospitalsDB from '../main/db/hospital-management';
+import * as reportsDB from '../main/db/reports';
 
 contextBridge.exposeInMainWorld('hospitalsDB', {
   get_hospitals: () => hospitalsDB.get_hospitals(),
@@ -82,4 +83,14 @@ contextBridge.exposeInMainWorld('schedulesDB', {
   update_schedule: (schedule_id, schedule_name,patient_type, note, cost) => schedulesDB.update_schedule(schedule_id,  schedule_name,patient_type, note, cost),
   create_schedule_meal: (schedule_id, weekday, ingredients) => schedulesDB.create_schedule_meal(schedule_id, weekday, ingredients),
   update_schedule_meal: (meal_id, ingredients) => schedulesDB.update_schedule_meal(meal_id, ingredients)
+});
+
+contextBridge.exposeInMainWorld('reportsDB', {
+  supplierReport: (supplierId, startDate, endDate, reportType) => reportsDB.supplierReport(supplierId, startDate, endDate, reportType),
+  paymentsReport: (hospitalId, startDate, endDate, reportType) => reportsDB.paymentsReport(hospitalId, startDate, endDate, reportType),
+  importReport: (supplierIds, hospitalId, ingredientIds, startDate, endDate, reportType) => reportsDB.importReport(supplierIds, hospitalId, ingredientIds, startDate, endDate, reportType),
+  returnsReport: (hospitalId, ingredientIds, startDate, endDate, reportType) => reportsDB.returnsReport(hospitalId, ingredientIds, startDate, endDate, reportType),
+  perishedReport: (hospitalId, ingredientIds, startDate, endDate, reportType) => reportsDB.perishedReport(hospitalId, ingredientIds, startDate, endDate, reportType),
+  mealsReport: (hospitalId, scheduleIds, startDate, endDate, reportType) => reportsDB.mealsReport(hospitalId, scheduleIds, startDate, endDate, reportType),
+  exportsIngredientsReport: (hospitalId, ingredientIds, startDate, endDate, reportType) => reportsDB.exportsIngredientsReport(hospitalId, ingredientIds, startDate, endDate, reportType),
 });
